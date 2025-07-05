@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2019",
+    "strictFunctionTypes": true,
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "build",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "exclude": ["node_modules", "build", "coverage"]
+}

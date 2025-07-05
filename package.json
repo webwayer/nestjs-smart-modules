@@ -1,0 +1,148 @@
+{
+  "name": "nestjs-smart-modules",
+  "version": "1.0.0",
+  "description": "A lightweight, type-safe library that simplifies NestJS module configuration. Build composable applications with centralized configuration and zero boilerplate.",
+  "keywords": [
+    "nestjs",
+    "configuration",
+    "config",
+    "modules",
+    "configurable",
+    "smart",
+    "typescript",
+    "dependency-injection",
+    "composable",
+    "type-safe"
+  ],
+  "homepage": "https://github.com/webwayer/nestjs-smart-modules#readme",
+  "bugs": {
+    "url": "https://github.com/webwayer/nestjs-smart-modules/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webwayer/nestjs-smart-modules.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Rodion Balandin",
+    "email": "webwayer@gmail.com"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/src/index.js",
+      "require": "./build/src/index.js",
+      "types": "./build/src/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "files": [
+    "build/src/**/*",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "packageManager": "npm@10.2.3",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@nestjs/common": "^11.1.3",
+    "@nestjs/core": "^11.1.3",
+    "@nestjs/platform-express": "^11.1.3",
+    "@nestjs/testing": "^11.1.3",
+    "@types/jest": "^30.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "eslint": "^9.30.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.1.7",
+    "jest": "^30.0.3",
+    "lint-staged": "^15.3.0",
+    "open-cli": "^8.0.0",
+    "prettier": "^3.6.2",
+    "reflect-metadata": "^0.2.2",
+    "rimraf": "^6.0.1",
+    "rxjs": "^7.8.2",
+    "standard-version": "^9.5.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10"
+  },
+  "scripts": {
+    "build": "rimraf build && tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rimraf build coverage node_modules/.cache",
+    "coverage": "jest --collectCoverage --testPathIgnorePatterns=spec/receipts",
+    "coverage:open": "npm run coverage && open-cli coverage/lcov-report/index.html",
+    "format": "prettier --write \"src/**/*.ts\" \"spec/**/*.ts\" \"**/*.{json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"spec/**/*.ts\" \"**/*.{json,md,yml,yaml}\"",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "prepack": "npm run build",
+    "prepare": "husky install && npm run build",
+    "prepublishOnly": "npm run lint && npm run test && npm run build",
+    "release": "standard-version",
+    "release:dry": "standard-version --dry-run",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:debug": "jest --runInBand --detectOpenHandles",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": ".",
+    "testRegex": "\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.(t|j)s"
+    ],
+    "coverageDirectory": "./coverage",
+    "coverageReporters": [
+      "html",
+      "text",
+      "text-summary",
+      "lcov"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    }
+  },
+  "dependencies": {
+    "@nestjs/config": "^4.0.2"
+  }
+}

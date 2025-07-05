@@ -1,0 +1,1 @@
+export { smartModule } from './smartModule'
