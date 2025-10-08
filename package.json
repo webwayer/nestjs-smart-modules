@@ -1,6 +1,6 @@
 {
   "name": "nestjs-smart-modules",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A lightweight, type-safe library that simplifies NestJS module configuration. Build composable applications with centralized configuration and zero boilerplate.",
   "keywords": [
     "nestjs",
