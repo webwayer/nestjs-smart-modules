@@ -1,6 +1,12 @@
 import { smartModule } from '../src/smartModule'
 import { smartModule as smartModuleFromIndex } from '../src/index'
-import { matchExpectedModuleStructure, typeAssert, TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
+import {
+  matchExpectedConfigModule,
+  matchExpectedModuleStructure,
+  typeAssert,
+  TypeTest,
+  ExpectedFactoryType,
+} from './utils/spec-helpers'
 
 describe('SmartModule Core Infrastructure', () => {
   describe('Module Exports', () => {
@@ -9,6 +15,43 @@ describe('SmartModule Core Infrastructure', () => {
       if (!smartModuleFromIndex || typeof smartModuleFromIndex !== 'function' || smartModuleFromIndex !== smartModule) {
         throw new Error('smartModule not properly exported from index')
       }
+    })
+  })
+
+  describe('Factory Reuse', () => {
+    it('should not leak generated modules into the definition imports across factory calls', () => {
+      class ImportedModule {}
+
+      class Config {
+        static label = 'config' as const
+        url: string
+      }
+
+      const definitionImports = [ImportedModule]
+
+      const factory = smartModule({
+        imports: definitionImports,
+        smartConfigs: [Config],
+      })
+
+      const first = factory({ config: { url: 'one' } })
+      const second = factory({ config: { url: 'two' } })
+
+      // the definition's own array stays untouched
+      expect(definitionImports).toEqual([ImportedModule])
+
+      // each produced module carries exactly its own generated config module,
+      // and the second call's config value wins in the second module
+      matchExpectedModuleStructure(first, { imports: 2 })
+      matchExpectedModuleStructure(second, { imports: 2 })
+      matchExpectedConfigModule(first.imports?.[1], {
+        name: 'ConfigSmartConfigModule',
+        value: { url: 'one' },
+      })
+      matchExpectedConfigModule(second.imports?.[1], {
+        name: 'ConfigSmartConfigModule',
+        value: { url: 'two' },
+      })
     })
   })
 

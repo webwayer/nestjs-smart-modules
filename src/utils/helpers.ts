@@ -25,11 +25,11 @@ export function pickLabeledAndPrefixed(obj: object, label?: string, prefix?: str
 }
 
 export function appendImports(module: DynamicModule, imports: DynamicModule[]): DynamicModule {
-  if (!module.imports) {
-    module.imports = imports
-  } else {
-    module.imports.push(...imports)
-  }
+  // Never mutate the existing imports: `module` is spread from the caller's
+  // module definition, so `module.imports` can be the definition's own array —
+  // pushing into it would leak this call's generated modules into every
+  // subsequent factory call.
+  module.imports = [...(module.imports ?? []), ...imports]
 
   return module
 }
