@@ -27,16 +27,17 @@
     "name": "Rodion Balandin",
     "email": "webwayer@gmail.com"
   },
+  "type": "commonjs",
   "exports": {
     ".": {
-      "import": "./build/src/index.js",
-      "require": "./build/src/index.js",
-      "types": "./build/src/index.d.ts"
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
     },
     "./package.json": "./package.json"
   },
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
+  "sideEffects": false,
   "files": [
     "build/src/**/*",
     "README.md",
@@ -51,6 +52,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
     "@eslint/js": "^10.0.1",
@@ -63,8 +65,10 @@
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "jest": "^30.0.3",
+    "knip": "^6.32.0",
     "open-cli": "^8.0.0",
     "prettier": "^3.6.2",
+    "publint": "^0.3.23",
     "reflect-metadata": "^0.2.2",
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.2",
@@ -92,7 +96,9 @@
     "test:watch": "jest --watch",
     "test:debug": "jest --runInBand --detectOpenHandles",
     "typecheck": "tsc --noEmit",
-    "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test"
+    "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run check:knip && npm run build && npm run check:package",
+    "check:package": "publint && attw --pack .",
+    "check:knip": "knip"
   },
   "jest": {
     "preset": "ts-jest",

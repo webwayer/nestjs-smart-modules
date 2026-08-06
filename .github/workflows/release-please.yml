@@ -38,4 +38,5 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm audit signatures
+      - run: npm pack --dry-run
       - run: npm publish

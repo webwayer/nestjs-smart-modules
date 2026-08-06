@@ -20,12 +20,12 @@ interface Prefixed<P extends string> {
   prefix: P
 }
 
-export type PrefixProps<T, P extends string> = {
+type PrefixProps<T, P extends string> = {
   [K in keyof T as K extends string ? `${P}${K}` : never]: T[K]
 }
-export type LabelProps<T, L extends string> = Record<L, T>
+type LabelProps<T, L extends string> = Record<L, T>
 
-export type InferSmartConfig<T> = T extends SmartConfig<infer U> & Labeled<infer L> & Prefixed<infer P>
+type InferSmartConfig<T> = T extends SmartConfig<infer U> & Labeled<infer L> & Prefixed<infer P>
   ? LabelProps<PrefixProps<U, P>, L>
   : T extends SmartConfig<infer U> & Labeled<infer L>
     ? LabelProps<U, L>
@@ -34,8 +34,8 @@ export type InferSmartConfig<T> = T extends SmartConfig<infer U> & Labeled<infer
       : T extends SmartConfig<infer U>
         ? U
         : never
-export type InferSmartImport<T> = T extends SmartImport<infer U> ? (U extends object ? U : null) : never
-export type InferExtendedSmartConfig<T> = T extends ExtendedSmartConfig<infer U> & Labeled<infer L> & Prefixed<infer P>
+type InferSmartImport<T> = T extends SmartImport<infer U> ? (U extends object ? U : null) : never
+type InferExtendedSmartConfig<T> = T extends ExtendedSmartConfig<infer U> & Labeled<infer L> & Prefixed<infer P>
   ? LabelProps<PrefixProps<U, P>, L>
   : T extends ExtendedSmartConfig<infer U> & { smartConfig: Prefixed<infer P> } & Labeled<infer L>
     ? LabelProps<PrefixProps<U, P>, L>
@@ -48,7 +48,7 @@ export type InferExtendedSmartConfig<T> = T extends ExtendedSmartConfig<infer U>
           : T extends ExtendedSmartConfig
             ? InferSmartConfig<T['smartConfig']>
             : never
-export type InferExtendedSmartImport<T> = T extends ExtendedSmartImport & Labeled<infer L> & Prefixed<infer P>
+type InferExtendedSmartImport<T> = T extends ExtendedSmartImport & Labeled<infer L> & Prefixed<infer P>
   ? LabelProps<PrefixProps<InferSmartImport<T['smartImport']>, P>, L>
   : T extends ExtendedSmartImport & Labeled<infer L>
     ? LabelProps<InferSmartImport<T['smartImport']>, L>
@@ -64,7 +64,7 @@ type UnboxSmartConfigPropsArray<A extends any[]> = A extends [infer L, ...infer 
   : A
 export type UnboxSmartConfigs<T extends AnySmartConfig[]> = UnboxSmartConfigPropsArray<T>
 
-export type InferSmartEntity<T> = T extends () => DynamicModule
+type InferSmartEntity<T> = T extends () => DynamicModule
   ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- {} is the identity element for Spread
     {}
   : T extends SmartConfig
@@ -76,7 +76,7 @@ export type InferSmartEntity<T> = T extends () => DynamicModule
         : T extends ExtendedSmartImport
           ? InferExtendedSmartImport<T>
           : never
-export type InferSmartEntities<A extends any[]> = A extends [infer L, ...infer R]
+type InferSmartEntities<A extends any[]> = A extends [infer L, ...infer R]
   ? [InferSmartEntity<L>, ...InferSmartEntities<R>]
   : A
 
