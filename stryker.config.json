@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/core/schema/stryker-schema.json",
+  "testRunner": "jest",
+  "mutate": ["src/**/*.ts", "!src/index.ts"],
+  "jest": { "configFile": "package.json" },
+  "reporters": ["clear-text", "html"],
+  "htmlReporter": { "fileName": "coverage/mutation/index.html" },
+  "tempDirName": ".stryker-tmp",
+  "ignoreStatic": true
+}
