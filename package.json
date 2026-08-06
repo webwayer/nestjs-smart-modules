@@ -106,7 +106,8 @@
     "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run check:knip && npm run build && npm run check:package",
     "check:package": "publint && attw --pack .",
     "check:knip": "knip",
-    "docs:api": "typedoc"
+    "docs:api": "typedoc",
+    "check:mutation": "stryker run"
   },
   "jest": {
     "preset": "ts-jest",

@@ -72,159 +72,25 @@ export type AnySmartConfig = SmartConfig | ExtendedSmartConfig
 export type AnySmartImport = SmartImport | ExtendedSmartImport | (() => DynamicModule)
 export type AnySmartEntity = AnySmartConfig | AnySmartImport
 
-// This is a hack and I don't kwno why it's needed
-// but it's needed to make the type checker happy
-// when using the factory pattern and factory function returns module with more than 1 export or provider (I guess import/controller too) ts infer smart module factory as any
-// but if expected array is a tuple then it's fine
-// I have no idea why this is the case
+// DynamicModule's array properties with non-nullable element types. These
+// used to be unions of explicit tuples (up to 10-11 elements): older
+// TypeScript collapsed factory inference to `any` when a definition factory
+// returned more than one provider/export. Current TypeScript infers plain
+// arrays correctly — spec/factory-inference.type-probe.ts guards against a
+// regression.
 
 type ImportType = NonNullable<DynamicModule['imports']>[number]
 type ProviderType = NonNullable<DynamicModule['providers']>[number]
 type ExportType = NonNullable<DynamicModule['exports']>[number]
 type ControllerType = NonNullable<DynamicModule['controllers']>[number]
 
-type ImportsOptions =
-  | []
-  | [ImportType]
-  | [ImportType, ImportType]
-  | [ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-    ]
-  | ImportType[]
+type ImportsOptions = ImportType[]
 
-type ProvidersOptions =
-  | []
-  | [ProviderType]
-  | [ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-    ]
-  | [
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-    ]
-  | ProviderType[]
+type ProvidersOptions = ProviderType[]
 
-type ExportsOptions =
-  | [...ExportType[]]
-  | []
-  | [ExportType]
-  | [ExportType, ExportType]
-  | [ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-    ]
-  | ExportType[]
+type ExportsOptions = ExportType[]
 
-type ControllersOptions =
-  | []
-  | [ControllerType]
-  | [ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType, ControllerType, ControllerType, ControllerType]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | ControllerType[]
+type ControllersOptions = ControllerType[]
 
 //
 
