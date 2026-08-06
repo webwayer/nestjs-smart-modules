@@ -200,6 +200,10 @@ Located in `spec/receipts/`, these test README examples:
 - Type assertions optional for integration tests
 - Excluded from coverage
 
+## Characterization Tests
+
+Integration tests that pin observed framework semantics (e.g. `module-identity.spec.ts`) follow the receipts rules: helper functions for module validation, direct `expect()` allowed for NestJS integration assertions.
+
 ## Naming Conventions
 
 - **Classes:** `DatabaseService`, `BasicConfig`, `AsyncConfig`
