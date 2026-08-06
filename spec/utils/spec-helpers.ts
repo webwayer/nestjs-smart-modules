@@ -76,8 +76,7 @@ export function matchExpectedModuleStructure(
 
 // Helper to match configuration module structure
 export function matchExpectedConfigModule<TValue = Record<string, unknown>>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  configModule: DynamicModule | any, // Accepts modules from imports or exports arrays
+  configModule: unknown, // Accepts modules from imports or exports arrays
   expected: {
     name: string
     token?: InjectionToken

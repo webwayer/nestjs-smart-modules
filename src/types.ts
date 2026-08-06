@@ -242,7 +242,7 @@ export function isSmartModuleFactory<
   return isFunction(x)
 }
 
-export function isFunction(c: any): c is Function {
+export function isFunction(c: unknown): c is (...args: unknown[]) => unknown {
   return typeof c === 'function'
 }
 

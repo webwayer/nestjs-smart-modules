@@ -26,8 +26,11 @@ export function smartModule<
 export function smartModule(moduleOrModuleDefinitionFn: SmartModuleOrFactory<[], [], []>): () => DynamicModule
 export function smartModule(...args: unknown[]) {
   const inlineSmartConfigs = args.slice(0, args.length - 1) as AnySmartConfig[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const smartModuleOrFactory = args[args.length - 1] as SmartModuleOrFactory<any, any, any>
+  const smartModuleOrFactory = args[args.length - 1] as SmartModuleOrFactory<
+    AnySmartConfig[],
+    AnySmartConfig[],
+    AnySmartImport[]
+  >
 
   return function (this: { name?: string } | undefined, arg: object | AsyncParams<object>) {
     const module = createNamedClass((this?.name || '') + 'SmartModule')
@@ -59,12 +62,15 @@ export function smartModule(...args: unknown[]) {
       ])
     }
 
+    // Instantiated config objects; the factory's variadic parameter is typed
+    // through UnboxSmartConfigs on the overload side, so the untyped
+    // implementation casts here.
     const inlineSmartConfigInstances = inlineSmartConfigs.map(c => {
       if (isSmartConfig(c)) {
         return instantiateSmartConfig(c, arg)
       }
       return instantiateExtendedSmartConfig(c, arg)
-    })
+    }) as AnySmartConfig[]
 
     const moduleDefinition = smartModuleOrFactory(inlineSmartConfigModules, ...inlineSmartConfigInstances)
 

@@ -61,7 +61,7 @@ describe('Utility Functions', () => {
     it('should test appendImports with existing imports', () => {
       const moduleWithImports = { imports: [{ module: class ExistingModule {} }] }
       const newImports = [{ module: class NewModule {} }]
-      const result = appendImports(moduleWithImports as any, newImports as any)
+      const result = appendImports(moduleWithImports as any, newImports)
 
       expect(result.imports).toHaveLength(2)
     })
@@ -72,11 +72,11 @@ describe('Utility Functions', () => {
         optionalValue?: string
       }
 
-      const result = applyPropsToSmartConfig(Config, {
+      const result = applyPropsToSmartConfig<Config & { extraValue: string }>(Config, {
         value: 'overridden',
         optionalValue: undefined,
         extraValue: 'should be filtered',
-      }) as Config & { extraValue: string }
+      })
 
       expect(result.value).toBe('overridden')
       expect(result.optionalValue).toBeUndefined()

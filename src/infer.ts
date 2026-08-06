@@ -65,7 +65,8 @@ type UnboxSmartConfigPropsArray<A extends any[]> = A extends [infer L, ...infer 
 export type UnboxSmartConfigs<T extends AnySmartConfig[]> = UnboxSmartConfigPropsArray<T>
 
 export type InferSmartEntity<T> = T extends () => DynamicModule
-  ? {}
+  ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- {} is the identity element for Spread
+    {}
   : T extends SmartConfig
     ? InferSmartConfig<T>
     : T extends ExtendedSmartConfig
