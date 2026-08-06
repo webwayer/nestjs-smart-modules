@@ -3,9 +3,19 @@
 import type { DynamicModule, Type } from '@nestjs/common'
 import type { UnboxSmartConfigs } from './infer.js'
 
+/**
+ * Asynchronous configuration for a smart module factory, mirroring the
+ * conventional NestJS `registerAsync` options shape.
+ *
+ * `imports` are applied to the generated config module itself, so `inject`
+ * resolves from those modules even when they are not global.
+ */
 export interface AsyncParams<T> {
+  /** Modules whose exported providers may be injected into `useFactory`. */
   imports?: DynamicModule['imports']
+  /** Injection tokens resolved and passed to `useFactory` as arguments. */
   inject?: any[]
+  /** Produces the configuration object (sync or async). */
   useFactory: (...args: any[]) => T | Promise<T>
 }
 
@@ -13,18 +23,30 @@ export function isAsyncParams<T>(o: T | AsyncParams<T>): o is AsyncParams<T> {
   return typeof (o as AsyncParams<T>).useFactory === 'function'
 }
 
+/**
+ * A configuration class usable in `smartConfigs`. Instance properties define
+ * the configuration shape (optional properties may carry defaults); static
+ * `label`, `prefix` and `token` customize namespacing and the injection
+ * token.
+ */
 export interface SmartConfig<T = any> extends Type<T> {
+  /** Prefixes every property name in the merged configuration (`db_port`). */
   prefix?: string
+  /** Nests the configuration under this key in the merged object. */
   label?: string
+  /** Overrides the injection token (defaults to the class itself). */
   token?: string | symbol
 }
+/** A smart module factory usable in `smartImports` — composes another smart module. */
 export type SmartImport<T = any> = (arg: AsyncParams<T> | T) => DynamicModule
+/** Inline form of {@link SmartConfig} with per-usage label/prefix/token overrides. */
 export interface ExtendedSmartConfig<T = any> {
   prefix?: string
   label?: string
   token?: string | symbol
   smartConfig: SmartConfig<T>
 }
+/** Inline form of {@link SmartImport} that namespaces the imported module's configuration. */
 export interface ExtendedSmartImport<T = any> {
   prefix?: string
   label?: string
@@ -206,6 +228,11 @@ type ControllersOptions =
 
 //
 
+/**
+ * A module definition accepted by `smartModule`: the standard
+ * `DynamicModule` properties plus `smartConfigs` (configuration classes)
+ * and `smartImports` (composed smart module factories).
+ */
 export type SmartModule<TC extends AnySmartConfig[], TI extends AnySmartImport[]> = {
   module?: DynamicModule['module']
   providers?: ProvidersOptions
@@ -217,6 +244,11 @@ export type SmartModule<TC extends AnySmartConfig[], TI extends AnySmartImport[]
   smartImports?: [...TI]
 }
 
+/**
+ * A definition factory: receives the generated config modules and the
+ * instantiated inline configs, returns a {@link SmartModule}. Invoked once
+ * per factory call.
+ */
 export type SmartModuleFactory<T extends AnySmartConfig[], TC extends AnySmartConfig[], TI extends AnySmartImport[]> = (
   imports: DynamicModule[],
   ...smartConfigs: UnboxSmartConfigs<T>

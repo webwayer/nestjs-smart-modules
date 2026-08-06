@@ -62,6 +62,7 @@ type UnboxSmartConfigProps<T> = T extends SmartConfig<infer U> | ExtendedSmartCo
 type UnboxSmartConfigPropsArray<A extends any[]> = A extends [infer L, ...infer R]
   ? [UnboxSmartConfigProps<L>, ...UnboxSmartConfigPropsArray<R>]
   : A
+/** Instance types of the given config classes, in order (factory arguments). */
 export type UnboxSmartConfigs<T extends AnySmartConfig[]> = UnboxSmartConfigPropsArray<T>
 
 type InferSmartEntity<T> = T extends () => DynamicModule
@@ -80,7 +81,9 @@ type InferSmartEntities<A extends any[]> = A extends [infer L, ...infer R]
   ? [InferSmartEntity<L>, ...InferSmartEntities<R>]
   : A
 
+/** The merged configuration object type for the given configs and imports. */
 export type InferSmartFactoryProps<T extends Array<AnySmartEntity>> = Unbox<Spread<InferSmartEntities<T>>>
+/** The factory signature produced by `smartModule` for the given configs and imports. */
 export type InferSmartFactory<T extends Array<AnySmartEntity>> =
   T extends Array<() => DynamicModule>
     ? () => DynamicModule

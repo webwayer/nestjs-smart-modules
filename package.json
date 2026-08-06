@@ -79,6 +79,7 @@
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.2",
     "ts-jest": "^29.4.0",
+    "typedoc": "^0.28.20",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.66.0"
   },
@@ -104,7 +105,8 @@
     "typecheck": "tsc --noEmit",
     "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run check:knip && npm run build && npm run check:package",
     "check:package": "publint && attw --pack .",
-    "check:knip": "knip"
+    "check:knip": "knip",
+    "docs:api": "typedoc"
   },
   "jest": {
     "preset": "ts-jest",
