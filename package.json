@@ -30,16 +30,22 @@
   "type": "commonjs",
   "exports": {
     ".": {
-      "types": "./build/src/index.d.ts",
-      "default": "./build/src/index.js"
+      "import": {
+        "types": "./build/esm/index.d.ts",
+        "default": "./build/esm/index.js"
+      },
+      "require": {
+        "types": "./build/cjs/index.d.ts",
+        "default": "./build/cjs/index.js"
+      }
     },
     "./package.json": "./package.json"
   },
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "build/cjs/index.js",
+  "types": "build/cjs/index.d.ts",
   "sideEffects": false,
   "files": [
-    "build/src/**/*",
+    "build/**/*",
     "README.md",
     "LICENSE",
     "package.json"
@@ -80,7 +86,7 @@
     "@nestjs/common": ">=10"
   },
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "build": "rimraf build && tsc -p tsconfig.build.cjs.json && tsc -p tsconfig.build.esm.json && node scripts/write-dual-markers.mjs",
     "build:watch": "tsc --watch",
     "clean": "rimraf build coverage node_modules/.cache",
     "coverage": "jest --collectCoverage --testPathIgnorePatterns=spec/receipts",
@@ -130,6 +136,9 @@
         "lines": 100,
         "statements": 100
       }
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     }
   }
 }
