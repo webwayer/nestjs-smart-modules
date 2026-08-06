@@ -125,11 +125,11 @@ npm install nestjs-smart-modules
 
 ## Compatibility
 
-| nestjs-smart-modules | NestJS (peer)                            | Node.js                                                   |
-| -------------------- | ---------------------------------------- | --------------------------------------------------------- |
-| 1.x                  | `>= 10` (test suite runs against 11.1.x) | `>= 18.16` declared; note NestJS 11 requires Node `>= 20` |
+| nestjs-smart-modules | NestJS (peer)                                                               | Node.js                                                   |
+| -------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------- |
+| 1.x                  | `^10 \|\| ^11` (CI tests both; v12 tracked by an allow-fail job vs `@next`) | `>= 18.16` declared; note NestJS 11 requires Node `>= 20` |
 
-Development happens on the Node version pinned in `.nvmrc`.
+The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`.
 
 ## Basic Usage
 
