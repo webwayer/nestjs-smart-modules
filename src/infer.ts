@@ -1,22 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DynamicModule, Type } from '@nestjs/common'
+import { DynamicModule } from '@nestjs/common'
 
 import { Unbox, Spread } from './utils/type-helpers'
-import { AsyncParams, AnySmartConfig, AnySmartEntity } from './types'
-
-interface SmartConfig<T = any> extends Type<T> {
-  token?: string
-}
-type SmartImport<T = any> = (arg: AsyncParams<T> | T) => DynamicModule
-
-interface ExtendedSmartConfig<T = any> {
-  token?: string
-  smartConfig: SmartConfig<T>
-}
-interface ExtendedSmartImport<T = any> {
-  smartImport: SmartImport<T>
-}
+import {
+  AsyncParams,
+  AnySmartConfig,
+  AnySmartEntity,
+  SmartConfig,
+  SmartImport,
+  ExtendedSmartConfig,
+  ExtendedSmartImport,
+} from './types'
 
 interface Labeled<L extends string> {
   label: L

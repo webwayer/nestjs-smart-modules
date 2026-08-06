@@ -13,22 +13,22 @@ export function isAsyncParams<T>(o: T | AsyncParams<T>): o is AsyncParams<T> {
   return typeof (o as AsyncParams<T>).useFactory === 'function'
 }
 
-export interface SmartConfig extends Type {
+export interface SmartConfig<T = any> extends Type<T> {
   prefix?: string
   label?: string
-  token?: string
+  token?: string | symbol
 }
 export type SmartImport<T = any> = (arg: AsyncParams<T> | T) => DynamicModule
-export interface ExtendedSmartConfig {
+export interface ExtendedSmartConfig<T = any> {
   prefix?: string
   label?: string
-  token?: string
-  smartConfig: SmartConfig
+  token?: string | symbol
+  smartConfig: SmartConfig<T>
 }
-export interface ExtendedSmartImport {
+export interface ExtendedSmartImport<T = any> {
   prefix?: string
   label?: string
-  smartImport: SmartImport
+  smartImport: SmartImport<T>
 }
 
 export function isSmartConfig(c: SmartConfig | ExtendedSmartConfig): c is SmartConfig {

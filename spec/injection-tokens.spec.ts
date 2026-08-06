@@ -382,6 +382,29 @@ describe('Injection Tokens', () => {
         value: { prop: 'value' },
       })
     })
+
+    it('should support symbol injection tokens', () => {
+      class SymbolConfig {
+        value: string
+      }
+
+      const SYMBOL_TOKEN = Symbol('SYMBOL_CONFIG')
+
+      const factory = smartModule({
+        smartConfigs: [{ smartConfig: SymbolConfig, token: SYMBOL_TOKEN }],
+      })
+
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ value: string }>>>()
+
+      const module = factory({ value: 'symbol-value' })
+
+      matchExpectedModuleStructure(module, { imports: 1 })
+      matchExpectedConfigModule(module.imports![0], {
+        name: 'SymbolConfigSmartConfigModule',
+        value: { value: 'symbol-value' },
+        token: SYMBOL_TOKEN,
+      })
+    })
   })
 
   describe('NestJS Integration', () => {
