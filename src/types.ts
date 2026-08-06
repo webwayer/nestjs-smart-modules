@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DynamicModule, Type } from '@nestjs/common'
-import { UnboxSmartConfigs } from './infer'
+import type { DynamicModule, Type } from '@nestjs/common'
+import type { UnboxSmartConfigs } from './infer.js'
 
 export interface AsyncParams<T> {
   imports?: DynamicModule['imports']

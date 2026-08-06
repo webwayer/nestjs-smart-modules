@@ -28,6 +28,10 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      // Type-only imports must be marked as such: together with
+      // verbatimModuleSyntax in the ESM build this guarantees the compiled
+      // output never gains a runtime dependency on @nestjs/common.
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-empty-function': 'warn',
       '@typescript-eslint/no-inferrable-types': 'error',

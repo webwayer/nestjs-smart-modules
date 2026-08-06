@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "isolatedModules": true,
     "target": "es2022",
     "useDefineForClassFields": false,
     "strict": true,

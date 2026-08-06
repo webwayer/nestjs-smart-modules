@@ -1,16 +1,6 @@
-import { pickLabeledAndPrefixed, createNamedClass } from './utils/helpers'
-import {
-  AsyncParams,
-  AnySmartConfig,
-  AnySmartImport,
-  ExtendedSmartConfig,
-  SmartConfig,
-  isAsyncParams,
-  isExtendedSmartConfig,
-  isExtendedSmartImport,
-  isSmartConfig,
-  isSmartImport,
-} from './types'
+import { pickLabeledAndPrefixed, createNamedClass } from './utils/helpers.js'
+import type { AsyncParams, AnySmartConfig, AnySmartImport, ExtendedSmartConfig, SmartConfig } from './types.js'
+import { isAsyncParams, isExtendedSmartConfig, isExtendedSmartImport, isSmartConfig, isSmartImport } from './types.js'
 
 export function moduleFromSmartConfig(smartConfigBase: AnySmartConfig, arg: AsyncParams<object> | object) {
   if (isSmartConfig(smartConfigBase)) {

@@ -1,5 +1,5 @@
-import { DynamicModule, InjectionToken } from '@nestjs/common'
-import { AsyncParams } from '../../src/types'
+import type { DynamicModule, InjectionToken } from '@nestjs/common'
+import type { AsyncParams } from '../../src/types'
 
 // Type testing utilities
 export type TypeTest<T, U> = T extends U ? (U extends T ? true : false) : false

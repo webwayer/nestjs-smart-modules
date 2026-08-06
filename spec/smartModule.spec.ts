@@ -1,12 +1,7 @@
 import { smartModule } from '../src/smartModule'
 import { smartModule as smartModuleFromIndex } from '../src/index'
-import {
-  matchExpectedConfigModule,
-  matchExpectedModuleStructure,
-  typeAssert,
-  TypeTest,
-  ExpectedFactoryType,
-} from './utils/spec-helpers'
+import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
+import { matchExpectedConfigModule, matchExpectedModuleStructure, typeAssert } from './utils/spec-helpers'
 
 describe('SmartModule Core Infrastructure', () => {
   describe('Module Exports', () => {

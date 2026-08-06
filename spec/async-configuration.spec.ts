@@ -1,12 +1,7 @@
-import { DynamicModule } from '@nestjs/common'
+import type { DynamicModule } from '@nestjs/common'
 import { smartModule } from '../src/smartModule'
-import {
-  typeAssert,
-  TypeTest,
-  ExpectedFactoryType,
-  matchExpectedModuleStructure,
-  matchExpectedConfigModule,
-} from './utils/spec-helpers'
+import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
+import { typeAssert, matchExpectedModuleStructure, matchExpectedConfigModule } from './utils/spec-helpers'
 
 describe('Asynchronous Configuration', () => {
   describe('Basic Async Configuration', () => {

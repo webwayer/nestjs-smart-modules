@@ -1,11 +1,6 @@
 import { smartModule } from '../src/smartModule'
-import {
-  matchExpectedModuleStructure,
-  matchExpectedConfigModule,
-  typeAssert,
-  TypeTest,
-  ExpectedFactoryType,
-} from './utils/spec-helpers'
+import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
+import { matchExpectedModuleStructure, matchExpectedConfigModule, typeAssert } from './utils/spec-helpers'
 
 describe('Injection Tokens', () => {
   describe('Custom Token Configuration', () => {

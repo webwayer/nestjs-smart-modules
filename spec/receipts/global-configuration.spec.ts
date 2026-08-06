@@ -1,4 +1,5 @@
-import { DynamicModule, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
+import type { DynamicModule } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { smartModule } from '../../src/smartModule'
 import { Test } from '@nestjs/testing'

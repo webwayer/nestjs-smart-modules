@@ -1,4 +1,4 @@
-export { smartModule } from './smartModule'
+export { smartModule } from './smartModule.js'
 export type {
   AsyncParams,
   SmartConfig,
@@ -10,5 +10,5 @@ export type {
   SmartModule,
   SmartModuleFactory,
   SmartModuleOrFactory,
-} from './types'
-export type { InferSmartFactory, InferSmartFactoryProps } from './infer'
+} from './types.js'
+export type { InferSmartFactory, InferSmartFactoryProps } from './infer.js'

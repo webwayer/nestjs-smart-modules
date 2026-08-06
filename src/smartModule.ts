@@ -1,22 +1,15 @@
-import { DynamicModule } from '@nestjs/common'
+import type { DynamicModule } from '@nestjs/common'
 
 import {
   instantiateSmartConfig,
   instantiateExtendedSmartConfig,
   moduleFromSmartConfig,
   moduleFromSmartImport,
-} from './modules'
-import { appendImports, createNamedClass } from './utils/helpers'
-import {
-  AsyncParams,
-  AnySmartConfig,
-  AnySmartImport,
-  SmartModuleOrFactory,
-  isAsyncParams,
-  isSmartConfig,
-  isSmartModule,
-} from './types'
-import { InferSmartFactory } from './infer'
+} from './modules.js'
+import { appendImports, createNamedClass } from './utils/helpers.js'
+import type { AsyncParams, AnySmartConfig, AnySmartImport, SmartModuleOrFactory } from './types.js'
+import { isAsyncParams, isSmartConfig, isSmartModule } from './types.js'
+import type { InferSmartFactory } from './infer.js'
 
 export function smartModule<
   T extends AnySmartConfig[] = [],

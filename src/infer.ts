@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DynamicModule } from '@nestjs/common'
+import type { DynamicModule } from '@nestjs/common'
 
-import { Unbox, Spread } from './utils/type-helpers'
-import {
+import type { Unbox, Spread } from './utils/type-helpers.js'
+import type {
   AsyncParams,
   AnySmartConfig,
   AnySmartEntity,
@@ -11,7 +11,7 @@ import {
   SmartImport,
   ExtendedSmartConfig,
   ExtendedSmartImport,
-} from './types'
+} from './types.js'
 
 interface Labeled<L extends string> {
   label: L
