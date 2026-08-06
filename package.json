@@ -78,7 +78,7 @@
     "@nestjs/common": ">=10"
   },
   "scripts": {
-    "build": "rimraf build && tsc",
+    "build": "rimraf build && tsc -p tsconfig.build.json",
     "build:watch": "tsc --watch",
     "clean": "rimraf build coverage node_modules/.cache",
     "coverage": "jest --collectCoverage --testPathIgnorePatterns=spec/receipts",

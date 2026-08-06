@@ -127,7 +127,7 @@ describe('Basic Usage', () => {
       })
 
       matchExpectedModuleStructure(moduleWithDefaults, { imports: 1 })
-      matchExpectedConfigModule(moduleWithDefaults.imports[0], {
+      matchExpectedConfigModule(moduleWithDefaults.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: { requiredProp: 'test-defaults', defaultProp: 'default' },
       })
@@ -139,7 +139,7 @@ describe('Basic Usage', () => {
       })
 
       matchExpectedModuleStructure(moduleWithOverride, { imports: 1 })
-      matchExpectedConfigModule(moduleWithOverride.imports[0], {
+      matchExpectedConfigModule(moduleWithOverride.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test-override',
@@ -155,7 +155,7 @@ describe('Basic Usage', () => {
       })
 
       matchExpectedModuleStructure(moduleWithAll, { imports: 1 })
-      matchExpectedConfigModule(moduleWithAll.imports[0], {
+      matchExpectedConfigModule(moduleWithAll.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test-all',
@@ -203,7 +203,7 @@ describe('Basic Usage', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ComplexConfigSmartConfigModule',
         value: {
           required: 'test',
@@ -254,7 +254,7 @@ describe('Basic Usage', () => {
         imports: 2,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'FirstConfigSmartConfigModule',
         value: {
           firstProp: 'first',
@@ -263,7 +263,7 @@ describe('Basic Usage', () => {
         },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'SecondConfigSmartConfigModule',
         value: {
           firstProp: 'first',
@@ -307,7 +307,7 @@ describe('Basic Usage', () => {
         exports: [ConfiguredService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -342,7 +342,7 @@ describe('Basic Usage', () => {
         exports: [ExtendedConfigService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -379,7 +379,7 @@ describe('Basic Usage', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'original',
@@ -414,7 +414,7 @@ describe('Basic Usage', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithRequiredSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -448,7 +448,7 @@ describe('Basic Usage', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'NullableConfigSmartConfigModule',
         value: {
           required: 'test',
@@ -481,7 +481,7 @@ describe('Basic Usage', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'StrictConfigSmartConfigModule',
         value: {
           allowedProp: 'test',
@@ -520,7 +520,7 @@ describe('Basic Usage', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(stringModule.imports[0], {
+      matchExpectedConfigModule(stringModule.imports![0], {
         name: 'GenericConfigSmartConfigModule',
         value: { value: 'test' },
       })
@@ -531,7 +531,7 @@ describe('Basic Usage', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(numberModule.imports[0], {
+      matchExpectedConfigModule(numberModule.imports![0], {
         name: 'GenericConfigSmartConfigModule',
         value: { value: 42 },
       })
@@ -571,7 +571,7 @@ describe('Basic Usage', () => {
           imports: 1,
         })
 
-        matchExpectedConfigModule(module.imports[0], {
+        matchExpectedConfigModule(module.imports![0], {
           name: 'UnionConfigSmartConfigModule',
           value: config,
         })

@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Keep emit under build/src so package.json entry points stay stable.
+    "rootDir": "."
+  },
+  "include": ["src"]
+}

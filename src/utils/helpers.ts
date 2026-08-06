@@ -8,20 +8,22 @@ export function createNamedClass(name: string) {
   return tmp[name]
 }
 
-function removePrefix(obj: object, prefix?: string) {
+type PlainObject = Record<string, unknown>
+
+function removePrefix(obj: PlainObject, prefix?: string): PlainObject {
   return prefix ? Object.fromEntries(Object.entries(obj).map(([k, v]) => [k.substring(prefix.length), v])) : obj
 }
 
-function filterByPrefix(obj: object, prefix?: string) {
+function filterByPrefix(obj: PlainObject, prefix?: string): PlainObject {
   return prefix ? Object.fromEntries(Object.entries(obj).filter(([k]) => k.startsWith(prefix))) : obj
 }
 
-function pickLabel(obj: object, label?: string) {
-  return label ? obj[label] : obj
+function pickLabel(obj: PlainObject, label?: string): PlainObject {
+  return label ? (obj[label] as PlainObject) : obj
 }
 
-export function pickLabeledAndPrefixed(obj: object, label?: string, prefix?: string) {
-  return removePrefix(filterByPrefix(pickLabel(obj, label), prefix), prefix)
+export function pickLabeledAndPrefixed(obj: object | undefined, label?: string, prefix?: string) {
+  return removePrefix(filterByPrefix(pickLabel((obj ?? {}) as PlainObject, label), prefix), prefix)
 }
 
 export function appendImports(module: DynamicModule, imports: DynamicModule[]): DynamicModule {

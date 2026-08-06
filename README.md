@@ -722,8 +722,8 @@ import { AuthService } from './auth.service'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        jwtSecret: configService.get('JWT_SECRET'),
-        expiresIn: configService.get('JWT_EXPIRES_IN'),
+        jwtSecret: configService.getOrThrow('JWT_SECRET'),
+        expiresIn: configService.getOrThrow('JWT_EXPIRES_IN'),
       }),
     }),
   ],
@@ -946,7 +946,7 @@ export class DatabaseService {
 
   static Inject = (label: string) => Inject(DatabaseService.getTokenForLabel(label))
 
-  static smartModuleCustom = function (label: string) {
+  static smartModuleCustom = function (this: typeof DatabaseService, label: string) {
     const token = this.getTokenForLabel(label)
 
     return smartModule({

@@ -31,7 +31,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -62,7 +62,7 @@ describe('Injection Tokens', () => {
         exports: [ServiceWithTokenAndProviders],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -95,7 +95,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -126,7 +126,7 @@ describe('Injection Tokens', () => {
         exports: [ServiceWithStaticTokenAndProviders],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -154,7 +154,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'TokenConfigSmartConfigModule',
         value: { value: 'test' },
         token: 'STATIC_TOKEN',
@@ -189,7 +189,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -225,7 +225,7 @@ describe('Injection Tokens', () => {
         exports: [ServiceWithOverrideAndProviders],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -267,7 +267,7 @@ describe('Injection Tokens', () => {
         imports: 2,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'FirstConfigSmartConfigModule',
         value: {
           firstProp: 'first',
@@ -276,7 +276,7 @@ describe('Injection Tokens', () => {
         token: 'FIRST_TOKEN',
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'SecondConfigSmartConfigModule',
         value: {
           firstProp: 'first',
@@ -318,7 +318,7 @@ describe('Injection Tokens', () => {
         imports: 3,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -328,7 +328,7 @@ describe('Injection Tokens', () => {
         token: 'STATIC_TOKEN',
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'NoTokenConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -337,7 +337,7 @@ describe('Injection Tokens', () => {
         token: 'INLINE_TOKEN',
       })
 
-      matchExpectedConfigModule(module.imports[2], {
+      matchExpectedConfigModule(module.imports![2], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -375,7 +375,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(asyncModule.imports[0], {
+      await matchExpectedConfigModule(asyncModule.imports![0], {
         name: 'TokenConfigSmartConfigModule',
         token: 'CUSTOM_TOKEN',
         isAsync: true,
@@ -414,7 +414,7 @@ describe('Injection Tokens', () => {
         exports: [STRING_TOKEN],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'TokenConfigSmartConfigModule',
         value: { value: 'test' },
         token: CONFIG_TOKEN,

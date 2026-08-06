@@ -37,7 +37,7 @@ describe('Asynchronous Configuration', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'async-value',
@@ -71,7 +71,7 @@ describe('Asynchronous Configuration', () => {
         exports: [AsyncServiceWithProviders],
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'AuthConfigSmartConfigModule',
         value: {
           jwtSecret: 'secret-key',
@@ -108,7 +108,7 @@ describe('Asynchronous Configuration', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'DatabaseConfigSmartConfigModule',
         value: {
           url: 'postgres://localhost',
@@ -143,7 +143,7 @@ describe('Asynchronous Configuration', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'LabeledConfigSmartConfigModule',
         value: { value: 'async-labeled', flag: true },
         isAsync: true,
@@ -174,7 +174,7 @@ describe('Asynchronous Configuration', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'TokenConfigSmartConfigModule',
         token: 'CUSTOM_TOKEN',
         value: { value: 'async-token-value' },
@@ -239,7 +239,7 @@ describe('Asynchronous Configuration', () => {
         exports: [MainServiceWithImport],
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'async-main',
@@ -249,7 +249,7 @@ describe('Asynchronous Configuration', () => {
         isAsync: true,
       })
 
-      const importedModule = module.imports[1] as DynamicModule
+      const importedModule = module.imports![1] as DynamicModule
 
       matchExpectedModuleStructure(importedModule, {
         imports: 1,
@@ -257,7 +257,7 @@ describe('Asynchronous Configuration', () => {
         exports: [ImportedAsyncService],
       })
 
-      await matchExpectedConfigModule(importedModule.imports[0], {
+      await matchExpectedConfigModule(importedModule.imports![0], {
         name: 'ImportConfigSmartConfigModule',
         value: { importValue: 'async-imported' },
         isAsync: true,
@@ -292,7 +292,7 @@ describe('Asynchronous Configuration', () => {
         imports: 2,
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'DbConfigSmartConfigModule',
         value: {
           url: 'postgres://localhost:5432',
@@ -301,7 +301,7 @@ describe('Asynchronous Configuration', () => {
         isAsync: true,
       })
 
-      await matchExpectedConfigModule(module.imports[1], {
+      await matchExpectedConfigModule(module.imports![1], {
         name: 'CacheConfigSmartConfigModule',
         value: {
           url: 'postgres://localhost:5432',
@@ -346,7 +346,7 @@ describe('Asynchronous Configuration', () => {
         exports: [SyncService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'sync-default',
@@ -381,7 +381,7 @@ describe('Asynchronous Configuration', () => {
         exports: [AsyncOnlyService],
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'AuthConfigSmartConfigModule',
         value: {
           jwtSecret: 'runtime-secret',
@@ -412,7 +412,7 @@ describe('Asynchronous Configuration', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(asyncModule.imports[0], {
+      await matchExpectedConfigModule(asyncModule.imports![0], {
         name: 'ExtendedConfigSmartConfigModule',
         value: { value: 'async-extended' },
         isAsync: true,
@@ -442,7 +442,7 @@ describe('Asynchronous Configuration', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(asyncModule.imports[0], {
+      await matchExpectedConfigModule(asyncModule.imports![0], {
         name: 'ExtendedDepsConfigSmartConfigModule',
         value: { value: 'async-extended-deps' },
         isAsync: true,
@@ -471,7 +471,7 @@ describe('Asynchronous Configuration', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(asyncModule.imports[0], {
+      await matchExpectedConfigModule(asyncModule.imports![0], {
         name: 'AsyncConfigSmartConfigModule',
         value: { value: 'test' },
         isAsync: true,
@@ -500,7 +500,7 @@ describe('Asynchronous Configuration', () => {
         providers: undefined,
       })
 
-      const configModule = asyncModule.imports[0] as DynamicModule
+      const configModule = asyncModule.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(configModule, {
         exports: 1,

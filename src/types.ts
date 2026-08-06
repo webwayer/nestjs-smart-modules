@@ -10,7 +10,7 @@ export interface AsyncParams<T> {
 }
 
 export function isAsyncParams<T>(o: T | AsyncParams<T>): o is AsyncParams<T> {
-  return typeof o['useFactory'] === 'function'
+  return typeof (o as AsyncParams<T>).useFactory === 'function'
 }
 
 export interface SmartConfig extends Type {
@@ -38,10 +38,12 @@ export function isSmartImport(c: SmartImport | ExtendedSmartImport): c is SmartI
   return isFunction(c) && !isClass(c)
 }
 export function isExtendedSmartConfig(c: SmartConfig | ExtendedSmartConfig): c is ExtendedSmartConfig {
-  return !!c['smartConfig'] && isSmartConfig(c['smartConfig'])
+  const candidate = (c as ExtendedSmartConfig).smartConfig
+  return !!candidate && isSmartConfig(candidate)
 }
 export function isExtendedSmartImport(c: SmartImport | ExtendedSmartImport): c is ExtendedSmartImport {
-  return !!c['smartImport'] && isSmartImport(c['smartImport'])
+  const candidate = (c as ExtendedSmartImport).smartImport
+  return !!candidate && isSmartImport(candidate)
 }
 
 export type AnySmartConfig = SmartConfig | ExtendedSmartConfig
@@ -54,10 +56,10 @@ export type AnySmartEntity = AnySmartConfig | AnySmartImport
 // but if expected array is a tuple then it's fine
 // I have no idea why this is the case
 
-type ImportType = DynamicModule['imports'][number]
-type ProviderType = DynamicModule['providers'][number]
-type ExportType = DynamicModule['exports'][number]
-type ControllerType = DynamicModule['controllers'][number]
+type ImportType = NonNullable<DynamicModule['imports']>[number]
+type ProviderType = NonNullable<DynamicModule['providers']>[number]
+type ExportType = NonNullable<DynamicModule['exports']>[number]
+type ControllerType = NonNullable<DynamicModule['controllers']>[number]
 
 type ImportsOptions =
   | []

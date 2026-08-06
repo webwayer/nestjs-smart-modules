@@ -124,9 +124,9 @@ export function matchExpectedConfigModule<TValue = Record<string, unknown>>(
     expect(provider.useFactory).toBeDefined()
     expect(typeof provider.useFactory).toBe('function')
 
-    const value = provider.useFactory?.()
+    const value = provider.useFactory?.() as TValue | Promise<TValue>
 
-    if (value['then']) {
+    if (value && typeof (value as Promise<TValue>).then === 'function') {
       return Promise.resolve(value).then(v => {
         expect(v).toEqual(expected.value)
       })

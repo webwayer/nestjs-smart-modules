@@ -78,7 +78,7 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
     })
 
     // Test the GlobalConfigModule structure (first import of AppModule)
-    const globalConfigModule = module.imports[0] as DynamicModule
+    const globalConfigModule = module.imports![0] as DynamicModule
     matchExpectedModuleStructure(globalConfigModule, {
       moduleName: 'GlobalConfigModuleSmartModule',
       imports: 1,
@@ -87,7 +87,7 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
     })
 
     // Test the GlobalConfig smart config module (first import of GlobalConfigModule)
-    matchExpectedConfigModule(globalConfigModule.imports[0], {
+    matchExpectedConfigModule(globalConfigModule.imports![0], {
       name: 'GlobalConfigSmartConfigModule',
       value: {
         appName: 'My Awesome App',
@@ -97,7 +97,7 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
     })
 
     // Verify that the exported module is the same as the imported config module
-    expect(globalConfigModule.exports[0]).toBe(globalConfigModule.imports[0])
+    expect(globalConfigModule.exports![0]).toBe(globalConfigModule.imports![0])
 
     // Test with actual NestJS application
     const moduleRef = await Test.createTestingModule({
@@ -121,10 +121,10 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
     })
 
     // Test the ConfigModule (first import - should be the standard NestJS ConfigModule)
-    expect(module.imports[0]).toBeDefined()
+    expect(module.imports![0]).toBeDefined()
 
     // Find the GlobalConfigModule in the imports (second import)
-    const globalConfigModule = module.imports[1] as DynamicModule
+    const globalConfigModule = module.imports![1] as DynamicModule
     matchExpectedModuleStructure(globalConfigModule, {
       moduleName: 'GlobalConfigModuleSmartModule',
       imports: 1,
@@ -135,7 +135,7 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
     // Test the GlobalConfig smart config module with async configuration
     // Note: For async configs, we don't test the exact values since they depend on runtime execution
     // The async `imports` belong to the config module itself, not to the factory provider.
-    matchExpectedModuleStructure(globalConfigModule.imports[0] as DynamicModule, {
+    matchExpectedModuleStructure(globalConfigModule.imports![0] as DynamicModule, {
       moduleName: 'GlobalConfigSmartConfigModule',
       imports: [ConfigModule],
       exports: [GlobalConfig],
@@ -149,7 +149,7 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
     })
 
     // Verify that the exported module is the same as the imported config module
-    expect(globalConfigModule.exports[0]).toBe(globalConfigModule.imports[0])
+    expect(globalConfigModule.exports![0]).toBe(globalConfigModule.imports![0])
 
     // Test with actual NestJS application
     const moduleRef = await Test.createTestingModule({

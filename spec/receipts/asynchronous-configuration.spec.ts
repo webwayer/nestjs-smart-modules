@@ -34,8 +34,8 @@ export class AuthService {
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        jwtSecret: configService.get('JWT_SECRET'),
-        expiresIn: configService.get('JWT_EXPIRES_IN'),
+        jwtSecret: configService.getOrThrow('JWT_SECRET'),
+        expiresIn: configService.getOrThrow('JWT_EXPIRES_IN'),
       }),
     }),
   ],
@@ -58,8 +58,8 @@ describe('Recipes: Asynchronous Configuration', () => {
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        jwtSecret: configService.get('JWT_SECRET'),
-        expiresIn: configService.get('JWT_EXPIRES_IN'),
+        jwtSecret: configService.getOrThrow('JWT_SECRET'),
+        expiresIn: configService.getOrThrow('JWT_EXPIRES_IN'),
       }),
     })
 
@@ -70,7 +70,7 @@ describe('Recipes: Asynchronous Configuration', () => {
       exports: [AuthService],
     })
 
-    matchExpectedModuleStructure(module.imports[0] as never, {
+    matchExpectedModuleStructure(module.imports![0] as never, {
       moduleName: 'AuthConfigSmartConfigModule',
       imports: [ConfigModule],
       exports: [AuthConfig],

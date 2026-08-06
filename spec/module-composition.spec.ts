@@ -48,13 +48,13 @@ describe('Module Composition', () => {
         imports: 1,
       })
 
-      const importedModule = module.imports[0] as DynamicModule
+      const importedModule = module.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(importedModule, {
         imports: 1,
       })
 
-      matchExpectedConfigModule(importedModule.imports[0], {
+      matchExpectedConfigModule(importedModule.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -83,7 +83,7 @@ describe('Module Composition', () => {
         imports: 2,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -91,13 +91,13 @@ describe('Module Composition', () => {
         },
       })
 
-      const importedModule = module.imports[1] as DynamicModule
+      const importedModule = module.imports![1] as DynamicModule
 
       matchExpectedModuleStructure(importedModule, {
         imports: 1,
       })
 
-      matchExpectedConfigModule(importedModule.imports[0], {
+      matchExpectedConfigModule(importedModule.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -144,7 +144,7 @@ describe('Module Composition', () => {
         exports: [AppService],
       })
 
-      const dbImport = module.imports[0] as DynamicModule
+      const dbImport = module.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(dbImport, {
         imports: 1,
@@ -152,7 +152,7 @@ describe('Module Composition', () => {
         exports: [DatabaseService],
       })
 
-      matchExpectedConfigModule(dbImport.imports[0], {
+      matchExpectedConfigModule(dbImport.imports![0], {
         name: 'DbConfigSmartConfigModule',
         value: {
           url: 'postgres://localhost',
@@ -160,7 +160,7 @@ describe('Module Composition', () => {
         },
       })
 
-      const cacheImport = module.imports[1] as DynamicModule
+      const cacheImport = module.imports![1] as DynamicModule
 
       matchExpectedModuleStructure(cacheImport, {
         imports: 1,
@@ -168,7 +168,7 @@ describe('Module Composition', () => {
         exports: [CacheService],
       })
 
-      matchExpectedConfigModule(cacheImport.imports[0], {
+      matchExpectedConfigModule(cacheImport.imports![0], {
         name: 'CacheConfigSmartConfigModule',
         value: {
           url: 'postgres://localhost',
@@ -214,7 +214,7 @@ describe('Module Composition', () => {
         exports: [TopService],
       })
 
-      const middleImport = module.imports[0] as DynamicModule
+      const middleImport = module.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(middleImport, {
         imports: 1,
@@ -222,7 +222,7 @@ describe('Module Composition', () => {
         exports: [MiddleService],
       })
 
-      const baseImport = middleImport.imports[0] as DynamicModule
+      const baseImport = middleImport.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(baseImport, {
         imports: 1,
@@ -230,7 +230,7 @@ describe('Module Composition', () => {
         exports: [BaseService],
       })
 
-      matchExpectedConfigModule(baseImport.imports[0], {
+      matchExpectedConfigModule(baseImport.imports![0], {
         name: 'DbConfigSmartConfigModule',
         value: {
           url: 'postgres://nested',
@@ -287,7 +287,7 @@ describe('Module Composition', () => {
         exports: [AppService],
       })
 
-      const analyticsImport = module.imports[0] as DynamicModule
+      const analyticsImport = module.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(analyticsImport, {
         imports: 2,
@@ -295,7 +295,7 @@ describe('Module Composition', () => {
         exports: [AnalyticsService],
       })
 
-      matchExpectedConfigModule(analyticsImport.imports[0], {
+      matchExpectedConfigModule(analyticsImport.imports![0], {
         name: 'LogConfigSmartConfigModule',
         value: {
           logLevel: 'debug',
@@ -303,7 +303,7 @@ describe('Module Composition', () => {
         },
       })
 
-      matchExpectedConfigModule(analyticsImport.imports[1], {
+      matchExpectedConfigModule(analyticsImport.imports![1], {
         name: 'MetricsConfigSmartConfigModule',
         value: {
           logLevel: 'debug',
@@ -346,7 +346,7 @@ describe('Module Composition', () => {
         exports: [PrefixedService],
       })
 
-      const logImport = module.imports[0] as DynamicModule
+      const logImport = module.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(logImport, {
         imports: 1,
@@ -354,7 +354,7 @@ describe('Module Composition', () => {
         exports: [LogService],
       })
 
-      matchExpectedConfigModule(logImport.imports[0], {
+      matchExpectedConfigModule(logImport.imports![0], {
         name: 'LogConfigSmartConfigModule',
         value: {
           logLevel: 'info',
@@ -404,7 +404,7 @@ describe('Module Composition', () => {
         exports: [ComplexService],
       })
 
-      const complexImport = module.imports[0] as DynamicModule
+      const complexImport = module.imports![0] as DynamicModule
 
       matchExpectedModuleStructure(complexImport, {
         imports: 1,
@@ -412,7 +412,7 @@ describe('Module Composition', () => {
         exports: [ConfigService],
       })
 
-      matchExpectedConfigModule(complexImport.imports[0], {
+      matchExpectedConfigModule(complexImport.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -449,7 +449,7 @@ describe('Module Composition', () => {
         exports: [FeatureService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -481,7 +481,7 @@ describe('Module Composition', () => {
         exports: [Config],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'global',

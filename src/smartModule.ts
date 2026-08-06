@@ -24,12 +24,12 @@ export function smartModule<
   TI extends AnySmartImport[] = [],
 >(...args: [...T, SmartModuleOrFactory<[...T], [...TC], [...TI]>]): InferSmartFactory<[...T, ...TC, ...TI]>
 export function smartModule(moduleOrModuleDefinitionFn: SmartModuleOrFactory<[], [], []>): () => DynamicModule
-export function smartModule(...args) {
+export function smartModule(...args: unknown[]) {
   const inlineSmartConfigs = args.slice(0, args.length - 1) as AnySmartConfig[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const smartModuleOrFactory = args[args.length - 1] as SmartModuleOrFactory<any, any, any>
 
-  return function (arg: object | AsyncParams<object>) {
+  return function (this: { name?: string } | undefined, arg: object | AsyncParams<object>) {
     const module = createNamedClass((this?.name || '') + 'SmartModule')
     const inlineSmartConfigModules = inlineSmartConfigs.map(c => moduleFromSmartConfig(c, arg))
 

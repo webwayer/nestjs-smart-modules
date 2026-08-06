@@ -24,7 +24,7 @@ export function moduleFromSmartConfig(smartConfigBase: AnySmartConfig, arg: Asyn
         providers: [
           {
             inject: arg.inject,
-            async useFactory(...args) {
+            async useFactory(...args: unknown[]) {
               return instantiateSmartConfig(smartConfigBase, await arg.useFactory(...args))
             },
             provide: smartConfigBase.token || smartConfigBase,
@@ -55,7 +55,7 @@ export function moduleFromSmartConfig(smartConfigBase: AnySmartConfig, arg: Asyn
         providers: [
           {
             inject: arg.inject,
-            async useFactory(...args) {
+            async useFactory(...args: unknown[]) {
               return instantiateExtendedSmartConfig(smartConfigBase, await arg.useFactory(...args))
             },
             provide: smartConfigBase.token || smartConfigBase.smartConfig,
@@ -94,7 +94,7 @@ export function moduleFromSmartImport(smartImportBase: AnySmartImport, arg: Asyn
       return smartImportBase.smartImport({
         imports: arg.imports,
         inject: arg.inject,
-        async useFactory(...args) {
+        async useFactory(...args: unknown[]) {
           return pickLabeledAndPrefixed(await arg.useFactory(...args), smartImportBase.label, smartImportBase.prefix)
         },
       })
