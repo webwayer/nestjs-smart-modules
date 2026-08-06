@@ -17,9 +17,12 @@ export function moduleFromSmartConfig(smartConfigBase: AnySmartConfig, arg: Asyn
     if (isAsyncParams(arg)) {
       return {
         module: createNamedClass(smartConfigBase.name + 'SmartConfigModule'),
+        // `imports` must live on the module, not on the provider: NestJS ignores
+        // unknown keys on a FactoryProvider, so `inject` would only resolve from
+        // global modules. Copied so the module never owns the caller's array.
+        imports: [...(arg.imports ?? [])],
         providers: [
           {
-            imports: arg.imports,
             inject: arg.inject,
             async useFactory(...args) {
               return instantiateSmartConfig(smartConfigBase, await arg.useFactory(...args))
@@ -47,9 +50,10 @@ export function moduleFromSmartConfig(smartConfigBase: AnySmartConfig, arg: Asyn
     if (isAsyncParams(arg)) {
       return {
         module: createNamedClass(smartConfigBase.smartConfig.name + 'SmartConfigModule'),
+        // Same as above: module-level `imports`, defensively copied.
+        imports: [...(arg.imports ?? [])],
         providers: [
           {
-            imports: arg.imports,
             inject: arg.inject,
             async useFactory(...args) {
               return instantiateExtendedSmartConfig(smartConfigBase, await arg.useFactory(...args))

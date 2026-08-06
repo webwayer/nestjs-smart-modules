@@ -115,6 +115,7 @@ describe('Asynchronous Configuration', () => {
           poolSize: 20,
         },
         isAsync: true,
+        imports: [{ module: MockDbService }],
       })
     })
   })
@@ -415,6 +416,37 @@ describe('Asynchronous Configuration', () => {
         name: 'ExtendedConfigSmartConfigModule',
         value: { value: 'async-extended' },
         isAsync: true,
+      })
+    })
+
+    it('should place async imports on extended smart config modules', async () => {
+      class ExtendedDepsConfig {
+        value: string
+      }
+
+      class MockDepService {}
+
+      const factory = smartModule({
+        smartConfigs: [{ smartConfig: ExtendedDepsConfig, label: 'extended' as const }],
+      })
+
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ extended: { value: string } }>>>()
+
+      const asyncModule = factory({
+        imports: [{ module: MockDepService }],
+        inject: [MockDepService],
+        useFactory: (_dep: MockDepService) => ({ extended: { value: 'async-extended-deps' } }),
+      })
+
+      matchExpectedModuleStructure(asyncModule, {
+        imports: 1,
+      })
+
+      await matchExpectedConfigModule(asyncModule.imports[0], {
+        name: 'ExtendedDepsConfigSmartConfigModule',
+        value: { value: 'async-extended-deps' },
+        isAsync: true,
+        imports: [{ module: MockDepService }],
       })
     })
   })

@@ -500,17 +500,20 @@ describe('Module Definition Factory', () => {
         name: 'AsyncFactoryConfigSmartConfigModule',
         value: { asyncValue: 'async_configured', asyncExtra: 'async_extra_configured' },
         isAsync: true,
+        imports: 1, // async `imports` land on every generated config module
       })
 
       await matchExpectedConfigModule(module.imports[1], {
         name: 'AsyncFactoryConfigSmartConfigModule',
         value: { asyncValue: 'async_configured', asyncExtra: 'async_extra_configured' },
         isAsync: true,
+        imports: 1,
       })
       await matchExpectedConfigModule(module.imports[2], {
         name: 'AsyncAdditionalConfigSmartConfigModule',
         value: { asyncValue: 'async_configured', asyncExtra: 'async_extra_configured' },
         isAsync: true,
+        imports: 1,
       })
 
       const importedModule = module.imports[3] as DynamicModule

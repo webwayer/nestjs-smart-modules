@@ -134,16 +134,17 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
 
     // Test the GlobalConfig smart config module with async configuration
     // Note: For async configs, we don't test the exact values since they depend on runtime execution
+    // The async `imports` belong to the config module itself, not to the factory provider.
     matchExpectedModuleStructure(globalConfigModule.imports[0] as DynamicModule, {
       moduleName: 'GlobalConfigSmartConfigModule',
+      imports: [ConfigModule],
       exports: [GlobalConfig],
       providers: [
-        expect.objectContaining({
+        {
           provide: GlobalConfig,
           useFactory: expect.any(Function),
           inject: [ConfigService],
-          imports: [ConfigModule],
-        }),
+        },
       ],
     })
 

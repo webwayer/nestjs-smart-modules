@@ -83,6 +83,7 @@ describe('Configuration Namespacing', () => {
         name: 'ConfigLabeledSmartConfigModule',
         value: { requiredProp: 'async-test', defaultProp: 'default' },
         isAsync: true,
+        imports: 1, // async `imports` land on the config module
       })
     })
   })
