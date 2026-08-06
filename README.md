@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/nestjs-smart-modules)](https://www.npmjs.com/package/nestjs-smart-modules)
 [![CI](https://img.shields.io/github/actions/workflow/status/webwayer/nestjs-smart-modules/ci.yml?branch=main&label=CI)](https://github.com/webwayer/nestjs-smart-modules/actions/workflows/ci.yml)
 [![API Reference](https://img.shields.io/badge/docs-API%20reference-blue)](https://webwayer.github.io/nestjs-smart-modules/)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/webwayer/nestjs-smart-modules/badge)](https://scorecard.dev/viewer/?uri=github.com/webwayer/nestjs-smart-modules)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![NestJS](https://img.shields.io/badge/NestJS-10%20%7C%2011-red.svg)](https://nestjs.com/)
 [![Downloads](https://img.shields.io/npm/dm/nestjs-smart-modules.svg)](https://www.npmjs.com/package/nestjs-smart-modules)

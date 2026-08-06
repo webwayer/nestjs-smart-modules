@@ -1,0 +1,6 @@
+rules:
+  cache-poisoning:
+    # ci.yml runs tests only and publishes no artifacts; the release and docs
+    # workflows (which do produce published artifacts) run without a cache.
+    ignore:
+      - ci.yml
