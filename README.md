@@ -123,6 +123,14 @@ This works in three steps:
 npm install nestjs-smart-modules
 ```
 
+## Compatibility
+
+| nestjs-smart-modules | NestJS (peer)                            | Node.js                                                   |
+| -------------------- | ---------------------------------------- | --------------------------------------------------------- |
+| 1.x                  | `>= 10` (test suite runs against 11.1.x) | `>= 18.16` declared; note NestJS 11 requires Node `>= 20` |
+
+Development happens on the Node version pinned in `.nvmrc`.
+
 ## Basic Usage
 
 ### Creating a Module with a Configuration Class
