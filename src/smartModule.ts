@@ -52,13 +52,11 @@ export function smartModule(...args: unknown[]) {
       const smartConfigModules = (moduleDefinition.smartConfigs || []).map(c => moduleFromSmartConfig(c, arg))
       const smartImportModules = (moduleDefinition.smartImports || []).map(c => moduleFromSmartImport(c, arg))
 
-      return appendImports(
-        {
-          module,
-          ...smartModuleOrFactory(inlineSmartConfigModules),
-        },
-        [...inlineSmartConfigModules, ...smartConfigModules, ...smartImportModules],
-      )
+      return appendImports({ module, ...moduleDefinition }, [
+        ...inlineSmartConfigModules,
+        ...smartConfigModules,
+        ...smartImportModules,
+      ])
     }
 
     const inlineSmartConfigInstances = inlineSmartConfigs.map(c => {
@@ -73,7 +71,7 @@ export function smartModule(...args: unknown[]) {
     const smartConfigModules = (moduleDefinition.smartConfigs || []).map(c => moduleFromSmartConfig(c, arg))
     const smartImportModules = (moduleDefinition.smartImports || []).map(c => moduleFromSmartImport(c, arg))
 
-    return appendImports({ module, ...smartModuleOrFactory(inlineSmartConfigModules, ...inlineSmartConfigInstances) }, [
+    return appendImports({ module, ...moduleDefinition }, [
       ...inlineSmartConfigModules,
       ...smartConfigModules,
       ...smartImportModules,

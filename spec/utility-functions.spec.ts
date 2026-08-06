@@ -53,6 +53,9 @@ describe('Utility Functions', () => {
 
       // Test with label only
       expect(pickLabeledAndPrefixed({ labeled: testObj }, 'labeled')).toEqual(testObj)
+
+      // Test with no configuration object at all
+      expect(pickLabeledAndPrefixed(undefined)).toEqual({})
     })
 
     it('should test appendImports with existing imports', () => {

@@ -725,3 +725,25 @@ describe('Module Definition Factory', () => {
     })
   })
 })
+
+describe('Factory Invocation Semantics', () => {
+  it('should invoke the module definition factory exactly once per module creation', () => {
+    class OnceConfig {
+      prop: string
+    }
+
+    const definitionFactory = jest.fn((imports: DynamicModule[]) => ({
+      imports,
+      providers: [{ provide: 'ONCE', useValue: 'once' }],
+      exports: ['ONCE'],
+    }))
+
+    const factory = smartModule(OnceConfig, definitionFactory)
+
+    factory({ prop: 'sync' })
+    expect(definitionFactory).toHaveBeenCalledTimes(1)
+
+    factory({ useFactory: () => ({ prop: 'async' }) })
+    expect(definitionFactory).toHaveBeenCalledTimes(2)
+  })
+})
