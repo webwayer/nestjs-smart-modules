@@ -2,7 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # release-please--** : PRs created with GITHUB_TOKEN never trigger
+    # pull_request workflows, so Release-PR branches get their required
+    # checks from this push trigger instead (same head SHA).
+    branches: [main, 'release-please--**']
   pull_request:
 
 permissions:
@@ -28,6 +31,21 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run validate
+
+  commitlint:
+    name: commitlint
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
   nest-compat:
     name: nest ${{ matrix.nest }}
