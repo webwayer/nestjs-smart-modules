@@ -4,3 +4,9 @@ rules:
     # workflows (which do produce published artifacts) run without a cache.
     ignore:
       - ci.yml
+  adhoc-packages:
+    # Testing alternate peer majors (NestJS 8/9/10/next, old-Node floor cell)
+    # requires installing outside the lockfile by design; these jobs run with
+    # contents: read only and produce no artifacts.
+    ignore:
+      - ci.yml
