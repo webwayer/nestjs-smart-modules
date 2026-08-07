@@ -5,7 +5,7 @@
 [![API Reference](https://img.shields.io/badge/docs-API%20reference-blue)](https://webwayer.github.io/nestjs-smart-modules/)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/webwayer/nestjs-smart-modules/badge)](https://scorecard.dev/viewer/?uri=github.com/webwayer/nestjs-smart-modules)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![NestJS](https://img.shields.io/badge/NestJS-10%20%7C%2011-red.svg)](https://nestjs.com/)
+[![NestJS](https://img.shields.io/badge/NestJS-8%20--%2011-red.svg)](https://nestjs.com/)
 [![Downloads](https://img.shields.io/npm/dm/nestjs-smart-modules.svg)](https://www.npmjs.com/package/nestjs-smart-modules)
 
 **Transform NestJS modules into composable, type-safe building blocks.** Configure once, compose everywhere.
@@ -130,9 +130,9 @@ npm install nestjs-smart-modules
 
 ## Compatibility
 
-| nestjs-smart-modules | NestJS (peer)                                                               | Node.js                                                   |
-| -------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------- |
-| 1.x                  | `^10 \|\| ^11` (CI tests both; v12 tracked by an allow-fail job vs `@next`) | `>= 18.16` declared; note NestJS 11 requires Node `>= 20` |
+| nestjs-smart-modules | NestJS (peer)                                                                       | Node.js                                                   |
+| -------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| 1.x                  | `^8 \|\| ^9 \|\| ^10 \|\| ^11` (CI tests all four; v12 tracked by a job vs `@next`) | `>= 18.16` declared; note NestJS 11 requires Node `>= 20` |
 
 The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`; CI tests Node 22, 24 and 26. Built with TypeScript 5.8; public factory type inference is verified in CI down to TypeScript 5.0.
 

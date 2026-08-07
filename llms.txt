@@ -1,6 +1,6 @@
 # nestjs-smart-modules
 
-> A lightweight, type-safe library that simplifies NestJS module configuration: services become composable smart modules, configuration merges across the dependency tree into a single typed object provided at the application root. Zero runtime dependencies; dual CJS/ESM builds; peer NestJS ^10 || ^11.
+> A lightweight, type-safe library that simplifies NestJS module configuration: services become composable smart modules, configuration merges across the dependency tree into a single typed object provided at the application root. Zero runtime dependencies; dual CJS/ESM builds; peer NestJS ^8 || ^9 || ^10 || ^11.
 
 Key semantics: every smart module factory call creates its own DynamicModule (own provider instances per importing branch); the merged configuration is delivered identically to all of them. Async configuration follows the registerAsync convention (imports/inject/useFactory) and resolves inject from non-global modules.
 
