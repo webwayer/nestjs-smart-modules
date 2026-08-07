@@ -1,4 +1,5 @@
 node_modules
 coverage
-builddocs-api
+build
+docs-api
 .stryker-tmp
