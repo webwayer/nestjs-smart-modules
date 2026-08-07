@@ -19,9 +19,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Tooling checks run once on the development pair (lockfile NestJS, Node 24):
-  # typecheck, lint, format, tests, coverage threshold, knip, build, publint,
-  # attw. Compatibility is the grid job's business.
+  # Tooling checks run once on the development pair (lockfile NestJS and the
+  # .nvmrc Node): typecheck, lint, format, tests, coverage threshold, knip,
+  # build, publint, attw. Compatibility is the grid job's business.
   validate:
     name: validate
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: 26
           cache: npm
       - run: npm ci
       - run: npm run validate
@@ -97,7 +97,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: 26
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -126,7 +126,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: 26
           cache: npm
       - run: npm ci
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
@@ -162,7 +162,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: 26
           cache: npm
       - run: npm ci
       - run: npm install --no-save --legacy-peer-deps @nestjs/common@next @nestjs/core@next @nestjs/testing@next @nestjs/platform-express@next @nestjs/config@next
