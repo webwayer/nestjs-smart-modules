@@ -101,6 +101,7 @@ This works in three steps:
 ## Table of Contents
 
 - [Installation](#installation)
+- [Compatibility](#compatibility)
 - [Basic Usage](#basic-usage)
   - [Creating a Module with a Configuration Class](#creating-a-module-with-a-configuration-class)
 - [Configuration](#configuration)
@@ -110,6 +111,7 @@ This works in three steps:
 - [Module Composition](#module-composition)
   - [Importing Other Smart Modules](#importing-other-smart-modules)
   - [Advanced: Namespacing Composed Modules](#advanced-namespacing-composed-modules)
+  - [Instance Semantics](#instance-semantics)
 - [Advanced Usage](#advanced-usage)
   - [Using Injection Tokens](#using-injection-tokens)
   - [Asynchronous Configuration](#asynchronous-configuration)
@@ -117,6 +119,7 @@ This works in three steps:
 - [Recipes](#recipes)
   - [Multiple Instances of a Module](#creating-and-using-multiple-instances-of-a-module)
   - [Global Configuration Module](#creating-a-global-configuration-module-the-forroot-pattern)
+- [Why Not `ConfigurableModuleBuilder`?](#why-not-configurablemodulebuilder)
 - [API Reference](#api-reference)
 
 ## Installation
@@ -131,7 +134,7 @@ npm install nestjs-smart-modules
 | -------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------- |
 | 1.x                  | `^10 \|\| ^11` (CI tests both; v12 tracked by an allow-fail job vs `@next`) | `>= 18.16` declared; note NestJS 11 requires Node `>= 20` |
 
-The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`.
+The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`. Built and type-tested with TypeScript 5.8; noticeably older TypeScript majors are not guaranteed to infer factory configuration types correctly.
 
 ## Basic Usage
 

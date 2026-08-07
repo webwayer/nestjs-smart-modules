@@ -30,7 +30,7 @@ The repo uses [Conventional Commits](https://www.conventionalcommits.org/) (`fix
 
 ## Tests
 
-Test conventions live in [spec/TESTING.md](spec/TESTING.md). In short: structure assertions go through the helpers in `spec/utils/spec-helpers.ts`, every README example has a mirror receipt spec in `spec/receipts/`, and coverage must stay at 100% (enforced).
+Test conventions live in [spec/TESTING.md](spec/TESTING.md). In short: structure assertions go through the helpers in `spec/utils/spec-helpers.ts`; README examples covered by `spec/receipts/` must stay line-for-line in sync with the README (and new recipes should get a receipt); coverage must stay at 100% — enforced locally and in CI via `npm run coverage` inside `validate`.
 
 ## Pull requests
 
