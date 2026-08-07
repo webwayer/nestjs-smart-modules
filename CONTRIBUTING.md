@@ -34,6 +34,6 @@ Test conventions live in [spec/TESTING.md](spec/TESTING.md). In short: structure
 
 ## Pull requests
 
-- Branch from `main`; PRs need the required checks green (`test (Node 22)`, `test (Node 24)`, `nest 8`, `nest 9`, `nest 10`, `nest 11`, `package`).
+- Branch from `main`; PRs need the required checks green (`test (Node 18.16.0)`, `test (Node 20)`, `test (Node 22)`, `test (Node 24)`, `nest 8`, `nest 9`, `nest 10`, `nest 11`, `package`).
 - The `nest next` job tracks the upcoming NestJS major and is allowed to fail.
 - Releases are cut by merging the release-please Release PR — contributors never publish manually.

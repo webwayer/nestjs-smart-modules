@@ -25,7 +25,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [22, 24, 26]
+        node: [20, 22, 24, 26]
+        include:
+          # The declared engines floor, exactly. NestJS 11 itself needs Node
+          # 20+, so a real Node 18 user runs Nest <= 10: this cell tests the
+          # floor against NestJS 10 and skips dev tooling that needs modern
+          # Node (ESLint 10 and rimraf 6 require 20.19+).
+          - node: '18.16.0'
+            floor: true
     steps:
       - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2
         with:
@@ -39,6 +46,16 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run validate
+        if: ${{ !matrix.floor }}
+      - if: ${{ matrix.floor }}
+        run: |
+          npm install --no-save @nestjs/common@10 @nestjs/core@10 @nestjs/testing@10 @nestjs/platform-express@10 @nestjs/config@3
+          npm test
+          npx tsc -p tsconfig.build.cjs.json
+          npx tsc -p tsconfig.build.esm.json
+          node scripts/write-dual-markers.mjs
+          node -e "const m = require('./build/cjs/index.js'); if (typeof m.smartModule !== 'function') process.exit(1)"
+          node -e "import('./build/esm/index.js').then(m => { if (typeof m.smartModule !== 'function') process.exit(1) }).catch(() => process.exit(1))"
 
   package:
     name: package
