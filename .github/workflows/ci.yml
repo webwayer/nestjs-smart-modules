@@ -19,20 +19,57 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: test (Node ${{ matrix.node }})
+  # Tooling checks run once on the development pair (lockfile NestJS, Node 24):
+  # typecheck, lint, format, tests, coverage threshold, knip, build, publint,
+  # attw. Compatibility is the grid job's business.
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run validate
+
+  # The full compatibility grid: every supported NestJS major against every
+  # Node line it supports. The only hole is Nest 11 on the Node 18 floor —
+  # Nest 11 itself requires Node >= 20.
+  compat:
+    name: nest ${{ matrix.nest }} / node ${{ matrix.node }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22, 24, 26]
+        nest: ['8', '9', '10', '11']
+        node: ['18.16.0', '20', '22', '24', '26']
+        exclude:
+          - nest: '11'
+            node: '18.16.0'
+        # Companion versions per major; an include entry that matches a combo
+        # by `nest` extends every cell of that major. --legacy-peer-deps for
+        # 8/9: their reflect-metadata ^0.1 peer conflicts with the installed
+        # 0.2 (runtime compatible), and @nestjs/config@2 predates newer peers.
         include:
-          # The declared engines floor, exactly. NestJS 11 itself needs Node
-          # 20+, so a real Node 18 user runs Nest <= 10: this cell tests the
-          # floor against NestJS 10 and skips dev tooling that needs modern
-          # Node (ESLint 10 and rimraf 6 require 20.19+).
-          - node: '18.16.0'
-            floor: true
+          - nest: '8'
+            config: '2'
+            flags: '--legacy-peer-deps'
+          - nest: '9'
+            config: '2'
+            flags: '--legacy-peer-deps'
+          - nest: '10'
+            config: '3'
+            flags: ''
+          - nest: '11'
+            config: '4'
+            flags: ''
     steps:
       - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2
         with:
@@ -45,17 +82,8 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
-      - run: npm run validate
-        if: ${{ !matrix.floor }}
-      - if: ${{ matrix.floor }}
-        run: |
-          npm install --no-save @nestjs/common@10 @nestjs/core@10 @nestjs/testing@10 @nestjs/platform-express@10 @nestjs/config@3
-          npm test
-          npx tsc -p tsconfig.build.cjs.json
-          npx tsc -p tsconfig.build.esm.json
-          node scripts/write-dual-markers.mjs
-          node -e "const m = require('./build/cjs/index.js'); if (typeof m.smartModule !== 'function') process.exit(1)"
-          node -e "import('./build/esm/index.js').then(m => { if (typeof m.smartModule !== 'function') process.exit(1) }).catch(() => process.exit(1))"
+      - run: npm install --no-save ${{ matrix.flags }} @nestjs/common@${{ matrix.nest }} @nestjs/core@${{ matrix.nest }} @nestjs/testing@${{ matrix.nest }} @nestjs/platform-express@${{ matrix.nest }} @nestjs/config@${{ matrix.config }}
+      - run: npm test
 
   package:
     name: package
@@ -118,40 +146,13 @@ jobs:
           persist-credentials: false
       - uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
 
-  nest-compat:
-    name: nest ${{ matrix.nest }}
+  # v12 pre-release (pure ESM), on the dev Node only. Alpha peer deps still
+  # reference ^11, hence --legacy-peer-deps; Jest cannot require(esm) yet, so
+  # failures are expected until the v12 RC (issue 2) and surface as a warning
+  # annotation instead of a red check.
+  nest-next:
+    name: nest next
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # Oldest supported peer lines. --legacy-peer-deps: their peer
-          # reflect-metadata ^0.1 conflicts with the installed 0.2 (runtime
-          # compatible), and @nestjs/config@2 predates the newer peer ranges.
-          - nest: '8'
-            config: '2'
-            flags: '--legacy-peer-deps'
-            experimental: false
-          - nest: '9'
-            config: '2'
-            flags: '--legacy-peer-deps'
-            experimental: false
-          - nest: '10'
-            config: '3'
-            flags: ''
-            experimental: false
-          # Current stable line (matches devDependencies).
-          - nest: '11'
-            config: '4'
-            flags: ''
-            experimental: false
-          # v12 pre-release (pure ESM). Alpha peer deps still reference ^11,
-          # hence --legacy-peer-deps; Jest cannot require(esm) yet, so this
-          # job is allowed to fail — it tracks forward compatibility only.
-          - nest: 'next'
-            config: 'next'
-            flags: '--legacy-peer-deps'
-            experimental: true
     steps:
       - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2
         with:
@@ -164,12 +165,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm install --no-save ${{ matrix.flags }} @nestjs/common@${{ matrix.nest }} @nestjs/core@${{ matrix.nest }} @nestjs/testing@${{ matrix.nest }} @nestjs/platform-express@${{ matrix.nest }} @nestjs/config@${{ matrix.config }}
-      - run: npm test
-        if: ${{ !matrix.experimental }}
-      # Forward-compatibility tracking: failures are expected until the v12 RC
-      # (issue 2) and surface as a warning annotation instead of a red check.
-      # Block scalar keeps the issue reference out of YAML comment territory.
-      - if: ${{ matrix.experimental }}
-        run: |
+      - run: npm install --no-save --legacy-peer-deps @nestjs/common@next @nestjs/core@next @nestjs/testing@next @nestjs/platform-express@next @nestjs/config@next
+      - run: |
           npm test || echo "::warning title=NestJS next compatibility::npm test fails against @nestjs/common@next — expected until the v12 RC (see issue 2)"
