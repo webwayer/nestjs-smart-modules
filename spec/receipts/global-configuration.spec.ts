@@ -23,7 +23,7 @@ export class GlobalConfigModule {
   }))
 }
 
-// Step 3: Inject the Global Config in a Feature Service
+// Step 2: Inject the Global Config in a Feature Service
 @Injectable()
 export class FeatureService {
   constructor(private readonly config: GlobalConfig) {}
@@ -32,6 +32,7 @@ export class FeatureService {
     if (!this.config.isProduction) {
       return 'not production'
     }
+
     return 'production'
   }
 }

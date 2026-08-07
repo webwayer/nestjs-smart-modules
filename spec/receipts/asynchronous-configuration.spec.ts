@@ -23,7 +23,7 @@ export class AuthService {
     exports: [AuthService],
   })
 
-  constructor(readonly config: AuthConfig) {}
+  constructor(private readonly config: AuthConfig) {}
 }
 
 // app.module.ts
@@ -91,10 +91,6 @@ describe('Recipes: Asynchronous Configuration', () => {
 
     const authService = moduleRef.get(AuthService)
     expect(authService).toBeInstanceOf(AuthService)
-    expect(authService.config).toEqual({
-      jwtSecret: 'jwt-secret-from-env',
-      expiresIn: '1h',
-    })
 
     const authConfig = moduleRef.get(AuthConfig)
     expect(authConfig).toEqual({

@@ -10,13 +10,13 @@ npm ci
 npm run validate
 ```
 
-`npm run validate` is the same pipeline CI runs: typecheck → lint → format check → tests → knip → build → publint + attw. If it is green locally, CI will be green.
+`npm run validate` is the same pipeline CI runs: typecheck → lint → format check → tests → coverage → knip → build → publint + attw. If it is green locally, CI will be green.
 
 ## Useful scripts
 
 | Script                      | What it does                                       |
 | --------------------------- | -------------------------------------------------- |
-| `npm test` / `test:watch`   | Jest test suite (92+ tests)                        |
+| `npm test` / `test:watch`   | Jest test suite                                    |
 | `npm run coverage`          | Coverage with a 100% threshold (receipts excluded) |
 | `npm run lint` / `lint:fix` | ESLint 10 with type-checked rules                  |
 | `npm run format`            | Prettier over the whole repo                       |
@@ -35,5 +35,5 @@ Test conventions live in [spec/TESTING.md](spec/TESTING.md). In short: structure
 ## Pull requests
 
 - Branch from `main`; PRs need the required checks green: `validate`, `package`, and every cell of the `nest N / node V` compatibility grid (NestJS 8-11 × Node 18.16-26, minus Nest 11 on Node 18).
-- The `nest next` job tracks the upcoming NestJS major and is allowed to fail.
+- The `nest next` job tracks the upcoming NestJS major; its failures surface as a warning annotation instead of a red check.
 - Releases are cut by merging the release-please Release PR — contributors never publish manually.

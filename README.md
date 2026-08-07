@@ -1077,7 +1077,7 @@ export class AppModule {}
 
 ### Creating a Global Configuration Module (the `forRoot` pattern)
 
-> **When to use this pattern:** While this pattern is powerful, it's important to understand its place. If you are building an entire application from the ground up with `nestjs-smart-modules`, you typically **do not need** a `.forRoot()` module. The recommended approach is to build a dependency tree and provide a single configuration object to your root `AppModule`, as described in the [Module Composition](#3-module-composition) section.
+> **When to use this pattern:** While this pattern is powerful, it's important to understand its place. If you are building an entire application from the ground up with `nestjs-smart-modules`, you typically **do not need** a `.forRoot()` module. The recommended approach is to build a dependency tree and provide a single configuration object to your root `AppModule`, as described in the [Module Composition](#module-composition) section.
 >
 > This `forRoot` pattern is most useful in two scenarios:
 >

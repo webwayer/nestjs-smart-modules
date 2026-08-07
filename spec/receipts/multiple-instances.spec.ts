@@ -31,6 +31,7 @@ export class DatabaseService {
 
   static smartModuleCustom = function (this: typeof DatabaseService, label: string) {
     const token = this.getTokenForLabel(label)
+
     return smartModule({
       smartConfigs: [DatabaseConfig],
       providers: [
