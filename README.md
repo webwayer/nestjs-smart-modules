@@ -134,7 +134,7 @@ npm install nestjs-smart-modules
 | -------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------- |
 | 1.x                  | `^10 \|\| ^11` (CI tests both; v12 tracked by an allow-fail job vs `@next`) | `>= 18.16` declared; note NestJS 11 requires Node `>= 20` |
 
-The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`. Built and type-tested with TypeScript 5.8; noticeably older TypeScript majors are not guaranteed to infer factory configuration types correctly.
+The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`; CI tests Node 22, 24 and 26. Built with TypeScript 5.8; public factory type inference is verified in CI down to TypeScript 5.0.
 
 ## Basic Usage
 

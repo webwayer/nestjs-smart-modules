@@ -29,6 +29,8 @@ jobs:
           node-version: 24
       - run: npm ci
       - run: npm run docs:api
+      # Serve llms.txt from the docs site root, where AI crawlers look for it.
+      - run: cp llms.txt docs-api/llms.txt
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: docs-api

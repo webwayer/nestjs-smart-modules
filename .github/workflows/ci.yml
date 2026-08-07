@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [22, 24]
+        node: [22, 24, 26]
     steps:
       - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2
         with:
@@ -62,6 +62,10 @@ jobs:
       # ESM artifact, and a missing .js specifier would only fail at runtime.
       - run: node -e "const m = require('./build/cjs/index.js'); if (typeof m.smartModule !== 'function') process.exit(1)"
       - run: node -e "import('./build/esm/index.js').then(m => { if (typeof m.smartModule !== 'function') process.exit(1) }).catch(() => process.exit(1))"
+      # The tuple-hack removal relies on modern inference: verify the public
+      # factory types still infer (and reject invalid configs) on the oldest
+      # supported TypeScript.
+      - run: npx -y typescript@5.0 tsc --noEmit --strict --skipLibCheck --module nodenext --moduleResolution nodenext --target es2022 --experimentalDecorators --strictPropertyInitialization false spec/factory-inference.type-probe.ts
 
   commitlint:
     name: commitlint
@@ -100,7 +104,6 @@ jobs:
   nest-compat:
     name: nest ${{ matrix.nest }}
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
@@ -136,3 +139,8 @@ jobs:
       - run: npm ci
       - run: npm install --no-save ${{ matrix.flags }} @nestjs/common@${{ matrix.nest }} @nestjs/core@${{ matrix.nest }} @nestjs/testing@${{ matrix.nest }} @nestjs/platform-express@${{ matrix.nest }} @nestjs/config@${{ matrix.config }}
       - run: npm test
+        if: ${{ !matrix.experimental }}
+      # Forward-compatibility tracking: failures are expected until the v12 RC
+      # (issue #2) and surface as a warning annotation instead of a red check.
+      - run: npm test || echo "::warning title=NestJS next compatibility::npm test fails against @nestjs/common@next — expected until the v12 RC (see issue #2)"
+        if: ${{ matrix.experimental }}
