@@ -65,7 +65,7 @@ jobs:
       # The tuple-hack removal relies on modern inference: verify the public
       # factory types still infer (and reject invalid configs) on the oldest
       # supported TypeScript.
-      - run: npx -y typescript@5.0 tsc --noEmit --strict --skipLibCheck --module nodenext --moduleResolution nodenext --target es2022 --experimentalDecorators --strictPropertyInitialization false spec/factory-inference.type-probe.ts
+      - run: npx -y -p typescript@5.0 tsc --noEmit --strict --skipLibCheck --module nodenext --moduleResolution nodenext --target es2022 --experimentalDecorators --strictPropertyInitialization false spec/factory-inference.type-probe.ts
 
   commitlint:
     name: commitlint
@@ -108,7 +108,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Oldest supported peer line.
+          # Oldest supported peer lines. --legacy-peer-deps: their peer
+          # reflect-metadata ^0.1 conflicts with the installed 0.2 (runtime
+          # compatible), and @nestjs/config@2 predates the newer peer ranges.
+          - nest: '8'
+            config: '2'
+            flags: '--legacy-peer-deps'
+            experimental: false
+          - nest: '9'
+            config: '2'
+            flags: '--legacy-peer-deps'
+            experimental: false
           - nest: '10'
             config: '3'
             flags: ''
@@ -141,6 +151,8 @@ jobs:
       - run: npm test
         if: ${{ !matrix.experimental }}
       # Forward-compatibility tracking: failures are expected until the v12 RC
-      # (issue #2) and surface as a warning annotation instead of a red check.
-      - run: npm test || echo "::warning title=NestJS next compatibility::npm test fails against @nestjs/common@next — expected until the v12 RC (see issue #2)"
-        if: ${{ matrix.experimental }}
+      # (issue 2) and surface as a warning annotation instead of a red check.
+      # Block scalar keeps the issue reference out of YAML comment territory.
+      - if: ${{ matrix.experimental }}
+        run: |
+          npm test || echo "::warning title=NestJS next compatibility::npm test fails against @nestjs/common@next — expected until the v12 RC (see issue 2)"
