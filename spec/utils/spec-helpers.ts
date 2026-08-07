@@ -1,5 +1,5 @@
-import { DynamicModule, InjectionToken } from '@nestjs/common'
-import { AsyncParams } from '../../src/types'
+import type { DynamicModule, InjectionToken } from '@nestjs/common'
+import type { AsyncParams } from '../../src/types'
 
 // Type testing utilities
 export type TypeTest<T, U> = T extends U ? (U extends T ? true : false) : false
@@ -76,13 +76,13 @@ export function matchExpectedModuleStructure(
 
 // Helper to match configuration module structure
 export function matchExpectedConfigModule<TValue = Record<string, unknown>>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  configModule: DynamicModule | any, // Accepts modules from imports or exports arrays
+  configModule: unknown, // Accepts modules from imports or exports arrays
   expected: {
     name: string
     token?: InjectionToken
     value: TValue
     isAsync?: boolean
+    imports?: number | DynamicModule['imports']
   },
 ) {
   const module = configModule as DynamicModule
@@ -90,6 +90,16 @@ export function matchExpectedConfigModule<TValue = Record<string, unknown>>(
   expect((module.module as { name?: string }).name).toBe(expected.name)
   expect(module.providers).toHaveLength(1)
   expect(module.exports).toHaveLength(1)
+
+  // Imports (default to 0 if not specified) — async `imports` belong on the
+  // config module itself; a FactoryProvider must never carry them.
+  const expectedImports = expected.imports ?? 0
+
+  if (typeof expectedImports === 'number') {
+    expect(module.imports || []).toHaveLength(expectedImports)
+  } else {
+    expect(module.imports).toEqual(expectedImports)
+  }
 
   interface ConfigProvider<T = TValue> {
     provide?: InjectionToken
@@ -102,6 +112,8 @@ export function matchExpectedConfigModule<TValue = Record<string, unknown>>(
   const provider = module.providers?.[0] as ConfigProvider<TValue>
   const exportedToken = module.exports?.[0]
 
+  expect(provider.imports).toBeUndefined()
+
   if (expected.token) {
     expect(provider.provide).toBe(expected.token)
     expect(exportedToken).toBe(expected.token)
@@ -111,9 +123,9 @@ export function matchExpectedConfigModule<TValue = Record<string, unknown>>(
     expect(provider.useFactory).toBeDefined()
     expect(typeof provider.useFactory).toBe('function')
 
-    const value = provider.useFactory?.()
+    const value = provider.useFactory?.() as TValue | Promise<TValue>
 
-    if (value['then']) {
+    if (value && typeof (value as Promise<TValue>).then === 'function') {
       return Promise.resolve(value).then(v => {
         expect(v).toEqual(expected.value)
       })

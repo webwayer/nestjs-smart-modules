@@ -1,34 +1,56 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DynamicModule, Type } from '@nestjs/common'
-import { UnboxSmartConfigs } from './infer'
+import type { DynamicModule, Type } from '@nestjs/common'
+import type { UnboxSmartConfigs } from './infer.js'
 
+/**
+ * Asynchronous configuration for a smart module factory, mirroring the
+ * conventional NestJS `registerAsync` options shape.
+ *
+ * `imports` are applied to the generated config module itself, so `inject`
+ * resolves from those modules even when they are not global.
+ */
 export interface AsyncParams<T> {
+  /** Modules whose exported providers may be injected into `useFactory`. */
   imports?: DynamicModule['imports']
+  /** Injection tokens resolved and passed to `useFactory` as arguments. */
   inject?: any[]
+  /** Produces the configuration object (sync or async). */
   useFactory: (...args: any[]) => T | Promise<T>
 }
 
 export function isAsyncParams<T>(o: T | AsyncParams<T>): o is AsyncParams<T> {
-  return typeof o['useFactory'] === 'function'
+  return typeof (o as AsyncParams<T>).useFactory === 'function'
 }
 
-export interface SmartConfig extends Type {
+/**
+ * A configuration class usable in `smartConfigs`. Instance properties define
+ * the configuration shape (optional properties may carry defaults); static
+ * `label`, `prefix` and `token` customize namespacing and the injection
+ * token.
+ */
+export interface SmartConfig<T = any> extends Type<T> {
+  /** Prefixes every property name in the merged configuration (`db_port`). */
   prefix?: string
+  /** Nests the configuration under this key in the merged object. */
   label?: string
-  token?: string
+  /** Overrides the injection token (defaults to the class itself). */
+  token?: string | symbol
 }
+/** A smart module factory usable in `smartImports` — composes another smart module. */
 export type SmartImport<T = any> = (arg: AsyncParams<T> | T) => DynamicModule
-export interface ExtendedSmartConfig {
+/** Inline form of {@link SmartConfig} with per-usage label/prefix/token overrides. */
+export interface ExtendedSmartConfig<T = any> {
   prefix?: string
   label?: string
-  token?: string
-  smartConfig: SmartConfig
+  token?: string | symbol
+  smartConfig: SmartConfig<T>
 }
-export interface ExtendedSmartImport {
+/** Inline form of {@link SmartImport} that namespaces the imported module's configuration. */
+export interface ExtendedSmartImport<T = any> {
   prefix?: string
   label?: string
-  smartImport: SmartImport
+  smartImport: SmartImport<T>
 }
 
 export function isSmartConfig(c: SmartConfig | ExtendedSmartConfig): c is SmartConfig {
@@ -38,172 +60,45 @@ export function isSmartImport(c: SmartImport | ExtendedSmartImport): c is SmartI
   return isFunction(c) && !isClass(c)
 }
 export function isExtendedSmartConfig(c: SmartConfig | ExtendedSmartConfig): c is ExtendedSmartConfig {
-  return !!c['smartConfig'] && isSmartConfig(c['smartConfig'])
+  const candidate = (c as ExtendedSmartConfig).smartConfig
+  return !!candidate && isSmartConfig(candidate)
 }
 export function isExtendedSmartImport(c: SmartImport | ExtendedSmartImport): c is ExtendedSmartImport {
-  return !!c['smartImport'] && isSmartImport(c['smartImport'])
+  const candidate = (c as ExtendedSmartImport).smartImport
+  return !!candidate && isSmartImport(candidate)
 }
 
 export type AnySmartConfig = SmartConfig | ExtendedSmartConfig
 export type AnySmartImport = SmartImport | ExtendedSmartImport | (() => DynamicModule)
 export type AnySmartEntity = AnySmartConfig | AnySmartImport
 
-// This is a hack and I don't kwno why it's needed
-// but it's needed to make the type checker happy
-// when using the factory pattern and factory function returns module with more than 1 export or provider (I guess import/controller too) ts infer smart module factory as any
-// but if expected array is a tuple then it's fine
-// I have no idea why this is the case
+// DynamicModule's array properties with non-nullable element types. These
+// used to be unions of explicit tuples (up to 10-11 elements): older
+// TypeScript collapsed factory inference to `any` when a definition factory
+// returned more than one provider/export. Current TypeScript infers plain
+// arrays correctly — spec/factory-inference.type-probe.ts guards against a
+// regression.
 
-type ImportType = DynamicModule['imports'][number]
-type ProviderType = DynamicModule['providers'][number]
-type ExportType = DynamicModule['exports'][number]
-type ControllerType = DynamicModule['controllers'][number]
+type ImportType = NonNullable<DynamicModule['imports']>[number]
+type ProviderType = NonNullable<DynamicModule['providers']>[number]
+type ExportType = NonNullable<DynamicModule['exports']>[number]
+type ControllerType = NonNullable<DynamicModule['controllers']>[number]
 
-type ImportsOptions =
-  | []
-  | [ImportType]
-  | [ImportType, ImportType]
-  | [ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType, ImportType]
-  | [
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-      ImportType,
-    ]
-  | ImportType[]
+type ImportsOptions = ImportType[]
 
-type ProvidersOptions =
-  | []
-  | [ProviderType]
-  | [ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType, ProviderType]
-  | [
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-    ]
-  | [
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-      ProviderType,
-    ]
-  | ProviderType[]
+type ProvidersOptions = ProviderType[]
 
-type ExportsOptions =
-  | [...ExportType[]]
-  | []
-  | [ExportType]
-  | [ExportType, ExportType]
-  | [ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType, ExportType]
-  | [
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-      ExportType,
-    ]
-  | ExportType[]
+type ExportsOptions = ExportType[]
 
-type ControllersOptions =
-  | []
-  | [ControllerType]
-  | [ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType, ControllerType, ControllerType]
-  | [ControllerType, ControllerType, ControllerType, ControllerType, ControllerType, ControllerType, ControllerType]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | [
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-      ControllerType,
-    ]
-  | ControllerType[]
+type ControllersOptions = ControllerType[]
 
 //
 
+/**
+ * A module definition accepted by `smartModule`: the standard
+ * `DynamicModule` properties plus `smartConfigs` (configuration classes)
+ * and `smartImports` (composed smart module factories).
+ */
 export type SmartModule<TC extends AnySmartConfig[], TI extends AnySmartImport[]> = {
   module?: DynamicModule['module']
   providers?: ProvidersOptions
@@ -215,6 +110,11 @@ export type SmartModule<TC extends AnySmartConfig[], TI extends AnySmartImport[]
   smartImports?: [...TI]
 }
 
+/**
+ * A definition factory: receives the generated config modules and the
+ * instantiated inline configs, returns a {@link SmartModule}. Invoked once
+ * per factory call.
+ */
 export type SmartModuleFactory<T extends AnySmartConfig[], TC extends AnySmartConfig[], TI extends AnySmartImport[]> = (
   imports: DynamicModule[],
   ...smartConfigs: UnboxSmartConfigs<T>
@@ -240,7 +140,7 @@ export function isSmartModuleFactory<
   return isFunction(x)
 }
 
-export function isFunction(c: any): c is Function {
+export function isFunction(c: unknown): c is (...args: unknown[]) => unknown {
   return typeof c === 'function'
 }
 

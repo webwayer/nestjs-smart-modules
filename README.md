@@ -1,9 +1,11 @@
 # nestjs-smart-modules
 
-[![npm version](https://badge.fury.io/js/nestjs-smart-modules.svg)](https://badge.fury.io/js/nestjs-smart-modules)
+[![npm version](https://img.shields.io/npm/v/nestjs-smart-modules)](https://www.npmjs.com/package/nestjs-smart-modules)
+[![CI](https://img.shields.io/github/actions/workflow/status/webwayer/nestjs-smart-modules/ci.yml?branch=main&label=CI)](https://github.com/webwayer/nestjs-smart-modules/actions/workflows/ci.yml)
+[![API Reference](https://img.shields.io/badge/docs-API%20reference-blue)](https://webwayer.github.io/nestjs-smart-modules/)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/webwayer/nestjs-smart-modules/badge)](https://scorecard.dev/viewer/?uri=github.com/webwayer/nestjs-smart-modules)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-10.0+-red.svg)](https://nestjs.com/)
+[![NestJS](https://img.shields.io/badge/NestJS-8%20--%2011-red.svg)](https://nestjs.com/)
 [![Downloads](https://img.shields.io/npm/dm/nestjs-smart-modules.svg)](https://www.npmjs.com/package/nestjs-smart-modules)
 
 **Transform NestJS modules into composable, type-safe building blocks.** Configure once, compose everywhere.
@@ -99,6 +101,7 @@ This works in three steps:
 ## Table of Contents
 
 - [Installation](#installation)
+- [Compatibility](#compatibility)
 - [Basic Usage](#basic-usage)
   - [Creating a Module with a Configuration Class](#creating-a-module-with-a-configuration-class)
 - [Configuration](#configuration)
@@ -108,6 +111,7 @@ This works in three steps:
 - [Module Composition](#module-composition)
   - [Importing Other Smart Modules](#importing-other-smart-modules)
   - [Advanced: Namespacing Composed Modules](#advanced-namespacing-composed-modules)
+  - [Instance Semantics](#instance-semantics)
 - [Advanced Usage](#advanced-usage)
   - [Using Injection Tokens](#using-injection-tokens)
   - [Asynchronous Configuration](#asynchronous-configuration)
@@ -115,6 +119,7 @@ This works in three steps:
 - [Recipes](#recipes)
   - [Multiple Instances of a Module](#creating-and-using-multiple-instances-of-a-module)
   - [Global Configuration Module](#creating-a-global-configuration-module-the-forroot-pattern)
+- [Why Not `ConfigurableModuleBuilder`?](#why-not-configurablemodulebuilder)
 - [API Reference](#api-reference)
 
 ## Installation
@@ -122,6 +127,14 @@ This works in three steps:
 ```bash
 npm install nestjs-smart-modules
 ```
+
+## Compatibility
+
+| nestjs-smart-modules | NestJS (peer)                  | Node.js      |
+| -------------------- | ------------------------------ | ------------ |
+| 1.x                  | `^8 \|\| ^9 \|\| ^10 \|\| ^11` | `>= 18.16.0` |
+
+CI runs the **full compatibility grid** — every supported NestJS major against every Node line it supports: Nest 8/9/10 on Node 18.16 (the declared floor), 20, 22, 24 and 26, and Nest 11 on Node 20+ (its own engines requirement). NestJS 12 (`@next`) is tracked by a warning-only job until its RC. The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`. Built with TypeScript 5.8; public factory type inference is verified in CI down to TypeScript 5.0.
 
 ## Basic Usage
 
@@ -601,6 +614,17 @@ export class AppService {
 export class AppModule {}
 ```
 
+### Instance Semantics
+
+Every call to a smart module factory creates its **own** `DynamicModule` — and therefore its own provider instances. In the composition example above, `BooksService` and `UsersService` each import `DatabaseService.smartModule`, so the application ends up with **two independent `DatabaseService` instances** receiving **the same merged configuration**. "Configured once" applies to configuration, not to instances.
+
+This holds on every supported NestJS major (verified on 10 and 11 under both module id algorithms — see `spec/module-identity.spec.ts`): the generated module classes are unique per call, so NestJS never deduplicates them.
+
+Practical consequences:
+
+- Stateless services are unaffected — extra instances are cheap.
+- Stateful services (connection pools, caches) are created once **per importing branch**. If a single shared instance matters, create the `DynamicModule` once and reuse the same object reference (NestJS deduplicates modules by reference), or provide the service through a `global: true` module — see the [Global Configuration recipe](#creating-a-global-configuration-module-the-forroot-pattern).
+
 ## Advanced Usage
 
 ### Using Injection Tokens
@@ -714,8 +738,8 @@ import { AuthService } from './auth.service'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        jwtSecret: configService.get('JWT_SECRET'),
-        expiresIn: configService.get('JWT_EXPIRES_IN'),
+        jwtSecret: configService.getOrThrow('JWT_SECRET'),
+        expiresIn: configService.getOrThrow('JWT_EXPIRES_IN'),
       }),
     }),
   ],
@@ -900,7 +924,7 @@ This section covers advanced patterns and solutions to common problems.
 
 ### Creating and Using Multiple Instances of a Module
 
-**The Challenge:** NestJS dependency injection is designed around singletons. If you import the same module in multiple places, you get the same provider instance. This makes it difficult to create separate instances (e.g., primary and replica databases).
+**The Challenge:** With static `@Module` classes, importing the same module everywhere yields one shared provider instance. Smart module factories already create separate instances per call (see [Instance Semantics](#instance-semantics)) — but those instances are anonymous and interchangeable. For primary/replica-style setups you need separate instances that are **individually addressable and configurable**; that is what this recipe provides.
 
 **The Solution: A Labeled Module Factory**
 
@@ -938,7 +962,7 @@ export class DatabaseService {
 
   static Inject = (label: string) => Inject(DatabaseService.getTokenForLabel(label))
 
-  static smartModuleCustom = function (label: string) {
+  static smartModuleCustom = function (this: typeof DatabaseService, label: string) {
     const token = this.getTokenForLabel(label)
 
     return smartModule({
@@ -1053,7 +1077,7 @@ export class AppModule {}
 
 ### Creating a Global Configuration Module (the `forRoot` pattern)
 
-> **When to use this pattern:** While this pattern is powerful, it's important to understand its place. If you are building an entire application from the ground up with `nestjs-smart-modules`, you typically **do not need** a `.forRoot()` module. The recommended approach is to build a dependency tree and provide a single configuration object to your root `AppModule`, as described in the [Module Composition](#3-module-composition) section.
+> **When to use this pattern:** While this pattern is powerful, it's important to understand its place. If you are building an entire application from the ground up with `nestjs-smart-modules`, you typically **do not need** a `.forRoot()` module. The recommended approach is to build a dependency tree and provide a single configuration object to your root `AppModule`, as described in the [Module Composition](#module-composition) section.
 >
 > This `forRoot` pattern is most useful in two scenarios:
 >
@@ -1168,7 +1192,23 @@ export class AsyncAppModule {
 }
 ```
 
+## Why Not `ConfigurableModuleBuilder`?
+
+NestJS ships `ConfigurableModuleBuilder` for building configurable modules, and it is a fine choice for a _single_ module with options. `smartModule` targets a different problem — composing an application out of many configurable pieces:
+
+|                              | `ConfigurableModuleBuilder`                   | `nestjs-smart-modules`                        |
+| ---------------------------- | --------------------------------------------- | --------------------------------------------- |
+| Scope                        | One module's options                          | A tree of modules                             |
+| Consumer wiring              | `register()` / `registerAsync()` per module   | One config object at the root                 |
+| Config typing                | Options interface per module                  | Merged and inferred from the whole tree       |
+| Dependencies between modules | Wired manually                                | `smartImports` compose and merge requirements |
+| Boilerplate                  | Module class + options type + builder + names | The service class is the module               |
+
+If you maintain one standalone library module with a `forRoot()`, the builder is enough. If you are assembling an application from composable blocks with centralized, fully typed configuration — that is what this library is for.
+
 ## API Reference
+
+The generated API reference (from the JSDoc in the sources) lives at **[webwayer.github.io/nestjs-smart-modules](https://webwayer.github.io/nestjs-smart-modules/)**.
 
 ### `smartModule()` Function
 

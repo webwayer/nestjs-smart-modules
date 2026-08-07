@@ -1,27 +1,20 @@
-import { pickLabeledAndPrefixed, createNamedClass } from './utils/helpers'
-import {
-  AsyncParams,
-  AnySmartConfig,
-  AnySmartImport,
-  ExtendedSmartConfig,
-  SmartConfig,
-  isAsyncParams,
-  isExtendedSmartConfig,
-  isExtendedSmartImport,
-  isSmartConfig,
-  isSmartImport,
-} from './types'
+import { pickLabeledAndPrefixed, createNamedClass } from './utils/helpers.js'
+import type { AsyncParams, AnySmartConfig, AnySmartImport, ExtendedSmartConfig, SmartConfig } from './types.js'
+import { isAsyncParams, isExtendedSmartConfig, isExtendedSmartImport, isSmartConfig, isSmartImport } from './types.js'
 
 export function moduleFromSmartConfig(smartConfigBase: AnySmartConfig, arg: AsyncParams<object> | object) {
   if (isSmartConfig(smartConfigBase)) {
     if (isAsyncParams(arg)) {
       return {
         module: createNamedClass(smartConfigBase.name + 'SmartConfigModule'),
+        // `imports` must live on the module, not on the provider: NestJS ignores
+        // unknown keys on a FactoryProvider, so `inject` would only resolve from
+        // global modules. Copied so the module never owns the caller's array.
+        imports: [...(arg.imports ?? [])],
         providers: [
           {
-            imports: arg.imports,
             inject: arg.inject,
-            async useFactory(...args) {
+            async useFactory(...args: unknown[]) {
               return instantiateSmartConfig(smartConfigBase, await arg.useFactory(...args))
             },
             provide: smartConfigBase.token || smartConfigBase,
@@ -47,11 +40,12 @@ export function moduleFromSmartConfig(smartConfigBase: AnySmartConfig, arg: Asyn
     if (isAsyncParams(arg)) {
       return {
         module: createNamedClass(smartConfigBase.smartConfig.name + 'SmartConfigModule'),
+        // Same as above: module-level `imports`, defensively copied.
+        imports: [...(arg.imports ?? [])],
         providers: [
           {
-            imports: arg.imports,
             inject: arg.inject,
-            async useFactory(...args) {
+            async useFactory(...args: unknown[]) {
               return instantiateExtendedSmartConfig(smartConfigBase, await arg.useFactory(...args))
             },
             provide: smartConfigBase.token || smartConfigBase.smartConfig,
@@ -90,7 +84,7 @@ export function moduleFromSmartImport(smartImportBase: AnySmartImport, arg: Asyn
       return smartImportBase.smartImport({
         imports: arg.imports,
         inject: arg.inject,
-        async useFactory(...args) {
+        async useFactory(...args: unknown[]) {
           return pickLabeledAndPrefixed(await arg.useFactory(...args), smartImportBase.label, smartImportBase.prefix)
         },
       })

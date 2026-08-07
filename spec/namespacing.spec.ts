@@ -1,12 +1,7 @@
-import { DynamicModule } from '@nestjs/common'
+import type { DynamicModule } from '@nestjs/common'
 import { smartModule } from '../src/smartModule'
-import {
-  matchExpectedModuleStructure,
-  matchExpectedConfigModule,
-  typeAssert,
-  TypeTest,
-  ExpectedFactoryType,
-} from './utils/spec-helpers'
+import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
+import { matchExpectedModuleStructure, matchExpectedConfigModule, typeAssert } from './utils/spec-helpers'
 
 describe('Configuration Namespacing', () => {
   describe('Label-Based Namespacing', () => {
@@ -36,7 +31,7 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(staticModule, { imports: 1 })
-      matchExpectedConfigModule(staticModule.imports[0], {
+      matchExpectedConfigModule(staticModule.imports![0], {
         name: 'ConfigLabeledSmartConfigModule',
         value: { requiredProp: 'static-test', defaultProp: 'default' },
       })
@@ -51,7 +46,7 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(inlineModule, { imports: 1 })
-      matchExpectedConfigModule(inlineModule.imports[0], {
+      matchExpectedConfigModule(inlineModule.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: { requiredProp: 'inline-test', optionalProp: 'optional', defaultProp: 'default' },
       })
@@ -66,7 +61,7 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(overrideModule, { imports: 1 })
-      matchExpectedConfigModule(overrideModule.imports[0], {
+      matchExpectedConfigModule(overrideModule.imports![0], {
         name: 'ConfigLabeledSmartConfigModule',
         value: { requiredProp: 'override-test', defaultProp: 'default' },
       })
@@ -79,10 +74,11 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(asyncModule, { imports: 1 })
-      await matchExpectedConfigModule(asyncModule.imports[0], {
+      await matchExpectedConfigModule(asyncModule.imports![0], {
         name: 'ConfigLabeledSmartConfigModule',
         value: { requiredProp: 'async-test', defaultProp: 'default' },
         isAsync: true,
+        imports: 1, // async `imports` land on the config module
       })
     })
   })
@@ -119,7 +115,7 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(staticModule, { imports: 1 })
-      matchExpectedConfigModule(staticModule.imports[0], {
+      matchExpectedConfigModule(staticModule.imports![0], {
         name: 'ConfigPrefixedSmartConfigModule',
         value: { requiredProp: 'static-test', optionalProp: 'optional', defaultProp: 'default' },
       })
@@ -134,7 +130,7 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(inlineModule, { imports: 1 })
-      matchExpectedConfigModule(inlineModule.imports[0], {
+      matchExpectedConfigModule(inlineModule.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: { requiredProp: 'inline-test', defaultProp: 'default' },
       })
@@ -149,7 +145,7 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(overrideModule, { imports: 1 })
-      matchExpectedConfigModule(overrideModule.imports[0], {
+      matchExpectedConfigModule(overrideModule.imports![0], {
         name: 'ConfigPrefixedSmartConfigModule',
         value: { requiredProp: 'override-test', defaultProp: 'default' },
       })
@@ -162,7 +158,7 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(asyncModule, { imports: 1 })
-      await matchExpectedConfigModule(asyncModule.imports[0], {
+      await matchExpectedConfigModule(asyncModule.imports![0], {
         name: 'ConfigPrefixedSmartConfigModule',
         value: { requiredProp: 'async-test', defaultProp: 'default' },
         isAsync: true,
@@ -206,11 +202,11 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(combinedModule, { imports: 2 })
-      matchExpectedConfigModule(combinedModule.imports[0], {
+      matchExpectedConfigModule(combinedModule.imports![0], {
         name: 'ApiConfigSmartConfigModule',
         value: { url: 'http://api.com', timeout: 5000 },
       })
-      matchExpectedConfigModule(combinedModule.imports[1], {
+      matchExpectedConfigModule(combinedModule.imports![1], {
         name: 'DbConfigSmartConfigModule',
         value: { port: 5432 },
       })
@@ -231,11 +227,11 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(conflictModule, { imports: 2 })
-      matchExpectedConfigModule(conflictModule.imports[0], {
+      matchExpectedConfigModule(conflictModule.imports![0], {
         name: 'DbConfigSmartConfigModule',
         value: { port: 5432 },
       })
-      matchExpectedConfigModule(conflictModule.imports[1], {
+      matchExpectedConfigModule(conflictModule.imports![1], {
         name: 'CacheConfigSmartConfigModule',
         value: { port: 6379 },
       })
@@ -254,11 +250,11 @@ describe('Configuration Namespacing', () => {
       })
 
       matchExpectedModuleStructure(labelConflictModule, { imports: 2 })
-      matchExpectedConfigModule(labelConflictModule.imports[0], {
+      matchExpectedConfigModule(labelConflictModule.imports![0], {
         name: 'DbConfigSmartConfigModule',
         value: { port: 5432 },
       })
-      matchExpectedConfigModule(labelConflictModule.imports[1], {
+      matchExpectedConfigModule(labelConflictModule.imports![1], {
         name: 'CacheConfigSmartConfigModule',
         value: { port: 6379 },
       })
@@ -305,24 +301,24 @@ describe('Configuration Namespacing', () => {
 
       matchExpectedModuleStructure(module, { imports: 2 })
 
-      const serviceAModule = module.imports[0] as DynamicModule
+      const serviceAModule = module.imports![0] as DynamicModule
       matchExpectedModuleStructure(serviceAModule, {
         imports: 1,
         providers: [ServiceA],
         exports: [ServiceA],
       })
-      matchExpectedConfigModule(serviceAModule.imports[0], {
+      matchExpectedConfigModule(serviceAModule.imports![0], {
         name: 'ConfigASmartConfigModule',
         value: { prop: 'value-a' },
       })
 
-      const serviceBModule = module.imports[1] as DynamicModule
+      const serviceBModule = module.imports![1] as DynamicModule
       matchExpectedModuleStructure(serviceBModule, {
         imports: 1,
         providers: [ServiceB],
         exports: [ServiceB],
       })
-      matchExpectedConfigModule(serviceBModule.imports[0], {
+      matchExpectedConfigModule(serviceBModule.imports![0], {
         name: 'ConfigBSmartConfigModule',
         value: { prop: 'value-b' },
       })
@@ -352,7 +348,7 @@ describe('Configuration Namespacing', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'FullStaticConfigSmartConfigModule',
         value: { value: 'test' },
         token: 'FULL_TOKEN',
@@ -388,7 +384,7 @@ describe('Configuration Namespacing', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'StaticConfigSmartConfigModule',
         value: { value: 'test' },
         token: 'OVERRIDE_TOKEN',

@@ -1,8 +1,14 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2019",
-    "strictFunctionTypes": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "isolatedModules": true,
+    "target": "es2022",
+    "useDefineForClassFields": false,
+    "strict": true,
+    // Config classes declare properties without initializers by design —
+    // values are provided through DI (same convention as NestJS itself).
+    "strictPropertyInitialization": false,
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

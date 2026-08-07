@@ -1,11 +1,6 @@
 import { smartModule } from '../src/smartModule'
-import {
-  matchExpectedModuleStructure,
-  matchExpectedConfigModule,
-  typeAssert,
-  TypeTest,
-  ExpectedFactoryType,
-} from './utils/spec-helpers'
+import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
+import { matchExpectedModuleStructure, matchExpectedConfigModule, typeAssert } from './utils/spec-helpers'
 
 describe('Injection Tokens', () => {
   describe('Custom Token Configuration', () => {
@@ -31,7 +26,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -62,7 +57,7 @@ describe('Injection Tokens', () => {
         exports: [ServiceWithTokenAndProviders],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -95,7 +90,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -126,7 +121,7 @@ describe('Injection Tokens', () => {
         exports: [ServiceWithStaticTokenAndProviders],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -154,7 +149,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'TokenConfigSmartConfigModule',
         value: { value: 'test' },
         token: 'STATIC_TOKEN',
@@ -189,7 +184,7 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -225,7 +220,7 @@ describe('Injection Tokens', () => {
         exports: [ServiceWithOverrideAndProviders],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -267,7 +262,7 @@ describe('Injection Tokens', () => {
         imports: 2,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'FirstConfigSmartConfigModule',
         value: {
           firstProp: 'first',
@@ -276,7 +271,7 @@ describe('Injection Tokens', () => {
         token: 'FIRST_TOKEN',
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'SecondConfigSmartConfigModule',
         value: {
           firstProp: 'first',
@@ -318,7 +313,7 @@ describe('Injection Tokens', () => {
         imports: 3,
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigWithStaticTokenSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -328,7 +323,7 @@ describe('Injection Tokens', () => {
         token: 'STATIC_TOKEN',
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'NoTokenConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -337,7 +332,7 @@ describe('Injection Tokens', () => {
         token: 'INLINE_TOKEN',
       })
 
-      matchExpectedConfigModule(module.imports[2], {
+      matchExpectedConfigModule(module.imports![2], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'test',
@@ -375,11 +370,34 @@ describe('Injection Tokens', () => {
         imports: 1,
       })
 
-      await matchExpectedConfigModule(asyncModule.imports[0], {
+      await matchExpectedConfigModule(asyncModule.imports![0], {
         name: 'TokenConfigSmartConfigModule',
         token: 'CUSTOM_TOKEN',
         isAsync: true,
         value: { prop: 'value' },
+      })
+    })
+
+    it('should support symbol injection tokens', () => {
+      class SymbolConfig {
+        value: string
+      }
+
+      const SYMBOL_TOKEN = Symbol('SYMBOL_CONFIG')
+
+      const factory = smartModule({
+        smartConfigs: [{ smartConfig: SymbolConfig, token: SYMBOL_TOKEN }],
+      })
+
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ value: string }>>>()
+
+      const module = factory({ value: 'symbol-value' })
+
+      matchExpectedModuleStructure(module, { imports: 1 })
+      matchExpectedConfigModule(module.imports![0], {
+        name: 'SymbolConfigSmartConfigModule',
+        value: { value: 'symbol-value' },
+        token: SYMBOL_TOKEN,
       })
     })
   })
@@ -414,7 +432,7 @@ describe('Injection Tokens', () => {
         exports: [STRING_TOKEN],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'TokenConfigSmartConfigModule',
         value: { value: 'test' },
         token: CONFIG_TOKEN,

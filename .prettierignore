@@ -1,0 +1,6 @@
+CHANGELOG.md
+package-lock.json
+build/
+coverage/
+docs-api/
+.stryker-tmp/

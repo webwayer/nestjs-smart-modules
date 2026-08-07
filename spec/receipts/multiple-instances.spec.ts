@@ -29,8 +29,9 @@ export class DatabaseService {
 
   static Inject = (label: string) => Inject(DatabaseService.getTokenForLabel(label))
 
-  static smartModuleCustom = function (label: string) {
+  static smartModuleCustom = function (this: typeof DatabaseService, label: string) {
     const token = this.getTokenForLabel(label)
+
     return smartModule({
       smartConfigs: [DatabaseConfig],
       providers: [
@@ -114,7 +115,7 @@ describe('Recipes: Creating and Using Multiple Instances of a Module', () => {
     })
 
     // Validate the primary database module (first import)
-    const primaryModule = module.imports[0] as DynamicModule
+    const primaryModule = module.imports![0] as DynamicModule
     matchExpectedModuleStructure(primaryModule, {
       imports: 1,
       providers: [
@@ -128,7 +129,7 @@ describe('Recipes: Creating and Using Multiple Instances of a Module', () => {
     })
 
     // Validate the replica database module (second import)
-    const replicaModule = module.imports[1] as DynamicModule
+    const replicaModule = module.imports![1] as DynamicModule
     matchExpectedModuleStructure(replicaModule, {
       imports: 1,
       providers: [
@@ -142,14 +143,14 @@ describe('Recipes: Creating and Using Multiple Instances of a Module', () => {
     })
 
     // Validate the primary config module (import of primary database module)
-    matchExpectedConfigModule(primaryModule.imports[0], {
+    matchExpectedConfigModule(primaryModule.imports![0], {
       name: 'DatabaseConfigSmartConfigModule',
       value: { url: 'postgres://primary-db' },
       token: DatabaseConfig,
     })
 
     // Validate the replica config module (import of replica database module)
-    matchExpectedConfigModule(replicaModule.imports[0], {
+    matchExpectedConfigModule(replicaModule.imports![0], {
       name: 'DatabaseConfigSmartConfigModule',
       value: { url: 'postgres://replica-db' },
       token: DatabaseConfig,

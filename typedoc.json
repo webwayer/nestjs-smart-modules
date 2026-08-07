@@ -1,0 +1,25 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs-api",
+  "excludeInternal": true,
+  "includeVersion": true,
+  "highlightLanguages": ["typescript", "ts", "javascript", "js", "json", "bash", "mermaid"],
+  "intentionallyNotExported": [
+    "Unbox",
+    "Spread",
+    "InferSmartEntities",
+    "ImportsOptions",
+    "ProvidersOptions",
+    "ExportsOptions",
+    "ControllersOptions",
+    "UnboxSmartConfigPropsArray"
+  ],
+  "externalSymbolLinkMappings": {
+    "@nestjs/common": {
+      "DynamicModule": "https://docs.nestjs.com/modules#dynamic-modules",
+      "Type": "https://docs.nestjs.com/",
+      "InjectionToken": "https://docs.nestjs.com/fundamentals/custom-providers"
+    }
+  }
+}

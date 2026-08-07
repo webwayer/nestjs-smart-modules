@@ -1,12 +1,7 @@
-import { DynamicModule } from '@nestjs/common'
+import type { DynamicModule } from '@nestjs/common'
 import { smartModule } from '../src/smartModule'
-import {
-  matchExpectedModuleStructure,
-  matchExpectedConfigModule,
-  typeAssert,
-  TypeTest,
-  ExpectedFactoryType,
-} from './utils/spec-helpers'
+import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
+import { matchExpectedModuleStructure, matchExpectedConfigModule, typeAssert } from './utils/spec-helpers'
 
 // ===== Mock Third-Party Modules =====
 
@@ -71,12 +66,12 @@ describe('Module Definition Factory', () => {
         exports: [ReportingService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ReportingConfigSmartConfigModule',
         value: { apiUrl: 'http://api.service.com' },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'ReportingConfigSmartConfigModule',
         value: { apiUrl: 'http://api.service.com' },
       })
@@ -116,20 +111,20 @@ describe('Module Definition Factory', () => {
         exports: [MultiConfigService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'DbConfigSmartConfigModule',
         value: { url: 'postgres://localhost:5432', host: 'redis://localhost:6379' },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'CacheConfigSmartConfigModule',
         value: { url: 'postgres://localhost:5432', host: 'redis://localhost:6379' },
       })
-      matchExpectedConfigModule(module.imports[2], {
+      matchExpectedConfigModule(module.imports![2], {
         name: 'DbConfigSmartConfigModule',
         value: { url: 'postgres://localhost:5432', host: 'redis://localhost:6379' },
       })
-      matchExpectedConfigModule(module.imports[3], {
+      matchExpectedConfigModule(module.imports![3], {
         name: 'CacheConfigSmartConfigModule',
         value: { url: 'postgres://localhost:5432', host: 'redis://localhost:6379' },
       })
@@ -184,11 +179,11 @@ describe('Module Definition Factory', () => {
         ],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'JwtConfigSmartConfigModule',
         value: { secret: 'your-secret-key', signOptions: { expiresIn: '60s' } },
       })
-      matchExpectedConfigModule(module.imports[2], {
+      matchExpectedConfigModule(module.imports![2], {
         name: 'JwtConfigSmartConfigModule',
         value: { secret: 'your-secret-key', signOptions: { expiresIn: '60s' } },
       })
@@ -240,12 +235,12 @@ describe('Module Definition Factory', () => {
         exports: [ConditionalService],
       })
 
-      matchExpectedConfigModule(moduleWithFeature.imports[0], {
+      matchExpectedConfigModule(moduleWithFeature.imports![0], {
         name: 'ConditionalConfigSmartConfigModule',
         value: { enableFeature: true, apiUrl: 'http://api.com' },
       })
 
-      matchExpectedConfigModule(moduleWithFeature.imports[2], {
+      matchExpectedConfigModule(moduleWithFeature.imports![2], {
         name: 'ConditionalConfigSmartConfigModule',
         value: { enableFeature: true, apiUrl: 'http://api.com' },
       })
@@ -266,12 +261,12 @@ describe('Module Definition Factory', () => {
         exports: [ConditionalService],
       })
 
-      matchExpectedConfigModule(moduleWithoutFeature.imports[0], {
+      matchExpectedConfigModule(moduleWithoutFeature.imports![0], {
         name: 'ConditionalConfigSmartConfigModule',
         value: { enableFeature: false, apiUrl: 'http://api.com' },
       })
 
-      matchExpectedConfigModule(moduleWithoutFeature.imports[1], {
+      matchExpectedConfigModule(moduleWithoutFeature.imports![1], {
         name: 'ConditionalConfigSmartConfigModule',
         value: { enableFeature: false, apiUrl: 'http://api.com' },
       })
@@ -318,12 +313,12 @@ describe('Module Definition Factory', () => {
         exports: 3, // MyService + 2 config modules
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'DbConfigSmartConfigModule',
         value: { url: 'postgres://localhost:5432', host: 'redis://localhost:6379' },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'CacheConfigSmartConfigModule',
         value: { url: 'postgres://localhost:5432', host: 'redis://localhost:6379' },
       })
@@ -380,7 +375,7 @@ describe('Module Definition Factory', () => {
         exports: [AdvancedService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'required',
@@ -388,7 +383,7 @@ describe('Module Definition Factory', () => {
         },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'required',
@@ -436,21 +431,21 @@ describe('Module Definition Factory', () => {
         exports: ['FACTORY_CONFIG'],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'FactoryConfigSmartConfigModule',
         value: { factoryValue: 'configured', additionalValue: 'extra_configured' },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'FactoryConfigSmartConfigModule',
         value: { factoryValue: 'configured', additionalValue: 'extra_configured' },
       })
-      matchExpectedConfigModule(module.imports[2], {
+      matchExpectedConfigModule(module.imports![2], {
         name: 'AdditionalConfigSmartConfigModule',
         value: { factoryValue: 'configured', additionalValue: 'extra_configured' },
       })
 
-      const importedModule = module.imports[3] as DynamicModule
+      const importedModule = module.imports![3] as DynamicModule
 
       matchExpectedModuleStructure(importedModule, {
         providers: [ImportedService, { provide: 'IMPORTED_SERVICE', useValue: 'imported' }],
@@ -496,24 +491,27 @@ describe('Module Definition Factory', () => {
         exports: ['ASYNC_FACTORY_CONFIG'],
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'AsyncFactoryConfigSmartConfigModule',
         value: { asyncValue: 'async_configured', asyncExtra: 'async_extra_configured' },
         isAsync: true,
+        imports: 1, // async `imports` land on every generated config module
       })
 
-      await matchExpectedConfigModule(module.imports[1], {
+      await matchExpectedConfigModule(module.imports![1], {
         name: 'AsyncFactoryConfigSmartConfigModule',
         value: { asyncValue: 'async_configured', asyncExtra: 'async_extra_configured' },
         isAsync: true,
+        imports: 1,
       })
-      await matchExpectedConfigModule(module.imports[2], {
+      await matchExpectedConfigModule(module.imports![2], {
         name: 'AsyncAdditionalConfigSmartConfigModule',
         value: { asyncValue: 'async_configured', asyncExtra: 'async_extra_configured' },
         isAsync: true,
+        imports: 1,
       })
 
-      const importedModule = module.imports[3] as DynamicModule
+      const importedModule = module.imports![3] as DynamicModule
 
       matchExpectedModuleStructure(importedModule, {
         providers: [AsyncImportedService, { provide: 'ASYNC_IMPORTED_SERVICE', useValue: 'async_imported' }],
@@ -566,7 +564,7 @@ describe('Module Definition Factory', () => {
         exports: ['EXTENDED_CONFIG'],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'BaseConfigSmartConfigModule',
         value: { value: 'configured' },
       })
@@ -612,7 +610,7 @@ describe('Module Definition Factory', () => {
         exports: [SyncOnlyService],
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'required',
@@ -620,7 +618,7 @@ describe('Module Definition Factory', () => {
         },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'ConfigSmartConfigModule',
         value: {
           requiredProp: 'required',
@@ -646,12 +644,12 @@ describe('Module Definition Factory', () => {
         imports: 2, // Factory pattern with inline config adds the config twice
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'ConfigurableModuleSmartConfigModule',
         value: { value: 'test-value' },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'ConfigurableModuleSmartConfigModule',
         value: { value: 'test-value' },
       })
@@ -676,12 +674,12 @@ describe('Module Definition Factory', () => {
         imports: 2, // Factory pattern with inline config creates config twice
       })
 
-      matchExpectedConfigModule(module.imports[0], {
+      matchExpectedConfigModule(module.imports![0], {
         name: 'DummyConfigSmartConfigModule',
         value: { dummy: 'test' },
       })
 
-      matchExpectedConfigModule(module.imports[1], {
+      matchExpectedConfigModule(module.imports![1], {
         name: 'DummyConfigSmartConfigModule',
         value: { dummy: 'test' },
       })
@@ -708,17 +706,39 @@ describe('Module Definition Factory', () => {
         imports: 2, // Factory pattern with inline config adds the config twice
       })
 
-      await matchExpectedConfigModule(module.imports[0], {
+      await matchExpectedConfigModule(module.imports![0], {
         name: 'AsyncConfigSmartConfigModule',
         value: { value: 'async-value' },
         isAsync: true,
       })
 
-      await matchExpectedConfigModule(module.imports[1], {
+      await matchExpectedConfigModule(module.imports![1], {
         name: 'AsyncConfigSmartConfigModule',
         value: { value: 'async-value' },
         isAsync: true,
       })
     })
+  })
+})
+
+describe('Factory Invocation Semantics', () => {
+  it('should invoke the module definition factory exactly once per module creation', () => {
+    class OnceConfig {
+      prop: string
+    }
+
+    const definitionFactory = jest.fn((imports: DynamicModule[]) => ({
+      imports,
+      providers: [{ provide: 'ONCE', useValue: 'once' }],
+      exports: ['ONCE'],
+    }))
+
+    const factory = smartModule(OnceConfig, definitionFactory)
+
+    factory({ prop: 'sync' })
+    expect(definitionFactory).toHaveBeenCalledTimes(1)
+
+    factory({ useFactory: () => ({ prop: 'async' }) })
+    expect(definitionFactory).toHaveBeenCalledTimes(2)
   })
 })
