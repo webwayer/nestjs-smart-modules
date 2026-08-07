@@ -17,12 +17,35 @@ jobs:
       pull-requests: write
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
+      prs_created: ${{ steps.release.outputs.prs_created }}
+      pr: ${{ steps.release.outputs.pr }}
     steps:
       - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2
         with:
           egress-policy: audit
       - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4
         id: release
+
+  # Events created with GITHUB_TOKEN (the Release-PR and its branch push)
+  # never trigger workflows, so the Release-PR would sit with required checks
+  # stuck in "Expected" forever. workflow_dispatch is exempt from that rule:
+  # explicitly dispatch CI onto the release branch so its check runs land on
+  # the PR head SHA.
+  trigger-release-pr-checks:
+    needs: release-please
+    if: needs.release-please.outputs.prs_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2
+        with:
+          egress-policy: audit
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ fromJson(needs.release-please.outputs.pr).headBranchName }}
+        run: gh workflow run ci.yml --repo "$REPO" --ref "$BRANCH"
 
   publish:
     needs: release-please

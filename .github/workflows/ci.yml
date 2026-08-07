@@ -2,11 +2,14 @@ name: CI
 
 on:
   push:
-    # release-please--** : PRs created with GITHUB_TOKEN never trigger
-    # pull_request workflows, so Release-PR branches get their required
-    # checks from this push trigger instead (same head SHA).
+    # release-please--** covers manual pushes to a Release-PR branch. Pushes
+    # made by release-please itself use GITHUB_TOKEN, and GITHUB_TOKEN events
+    # never trigger workflows — so release-please.yml additionally dispatches
+    # this workflow onto the release branch (workflow_dispatch is exempt from
+    # that suppression rule).
     branches: [main, 'release-please--**']
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -55,6 +58,10 @@ jobs:
       - run: npm run build
       - run: npm run check:package
       - run: npm run check:knip
+      # Smoke both published entry points: nothing else in CI executes the
+      # ESM artifact, and a missing .js specifier would only fail at runtime.
+      - run: node -e "const m = require('./build/cjs/index.js'); if (typeof m.smartModule !== 'function') process.exit(1)"
+      - run: node -e "import('./build/esm/index.js').then(m => { if (typeof m.smartModule !== 'function') process.exit(1) }).catch(() => process.exit(1))"
 
   commitlint:
     name: commitlint

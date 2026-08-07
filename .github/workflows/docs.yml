@@ -9,7 +9,8 @@ permissions: {}
 
 concurrency:
   group: docs-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel an in-flight Pages deployment (per the official starter).
+  cancel-in-progress: false
 
 jobs:
   build:
