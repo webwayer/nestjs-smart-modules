@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Releases are managed by [release-please](https://github.com/googleapis/release-please); commits follow [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.1.1](https://github.com/webwayer/nestjs-smart-modules/compare/v1.1.0...v1.1.1) (2026-09-06)
+
+
+### Bug Fixes
+
+* **infer:** a smart module takes a list of any length up to a thousand ([e931f4d](https://github.com/webwayer/nestjs-smart-modules/commit/e931f4dc1faf89fe79dbdad7db255b1a181ee50a))
+
 ## [1.1.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.0.3...v1.1.0) (2026-08-07)
 
 
