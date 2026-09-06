@@ -59,8 +59,12 @@ type InferExtendedSmartImport<T> = T extends ExtendedSmartImport & Labeled<infer
         : never
 
 type UnboxSmartConfigProps<T> = T extends SmartConfig<infer U> | ExtendedSmartConfig<infer U> ? Unbox<U> : null
-type UnboxSmartConfigPropsArray<A extends any[]> = A extends [infer L, ...infer R]
-  ? [UnboxSmartConfigProps<L>, ...UnboxSmartConfigPropsArray<R>]
+// A homomorphic mapped type over a tuple maps element by element with no recursion,
+// so a list of any length costs one instantiation; peeling the tuple head by tail
+// instead used to hit TypeScript's depth limit at about fifty entries (TS2589).
+// The guard keeps a non-tuple array (and `any`) answering itself, as the recursion did.
+type UnboxSmartConfigPropsArray<A extends any[]> = A extends [unknown, ...unknown[]]
+  ? { [K in keyof A]: UnboxSmartConfigProps<A[K]> }
   : A
 /** Instance types of the given config classes, in order (factory arguments). */
 export type UnboxSmartConfigs<T extends AnySmartConfig[]> = UnboxSmartConfigPropsArray<T>
@@ -77,8 +81,9 @@ type InferSmartEntity<T> = T extends () => DynamicModule
         : T extends ExtendedSmartImport
           ? InferExtendedSmartImport<T>
           : never
-type InferSmartEntities<A extends any[]> = A extends [infer L, ...infer R]
-  ? [InferSmartEntity<L>, ...InferSmartEntities<R>]
+// Mapped for the same reason as `UnboxSmartConfigPropsArray` above.
+type InferSmartEntities<A extends any[]> = A extends [unknown, ...unknown[]]
+  ? { [K in keyof A]: InferSmartEntity<A[K]> }
   : A
 
 /** The merged configuration object type for the given configs and imports. */
