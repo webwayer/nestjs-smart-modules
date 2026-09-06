@@ -2,6 +2,7 @@
 
 import type { DynamicModule, Type } from '@nestjs/common'
 import type { UnboxSmartConfigs } from './infer.js'
+import type { ListOfUpTo } from './utils/type-helpers.js'
 
 /**
  * Asynchronous configuration for a smart module factory, mirroring the
@@ -72,25 +73,41 @@ export type AnySmartConfig = SmartConfig | ExtendedSmartConfig
 export type AnySmartImport = SmartImport | ExtendedSmartImport | (() => DynamicModule)
 export type AnySmartEntity = AnySmartConfig | AnySmartImport
 
-// DynamicModule's array properties with non-nullable element types. These
-// used to be unions of explicit tuples (up to 10-11 elements): older
-// TypeScript collapsed factory inference to `any` when a definition factory
-// returned more than one provider/export. Current TypeScript infers plain
-// arrays correctly — spec/factory-inference.type-probe.ts guards against a
-// regression.
+// DynamicModule's array properties with non-nullable element types, each
+// offered to the caller as a UNION OF FIXED-LENGTH TUPLES up to a cap and a
+// plain array past it — not as the plain array alone. The tuple shape is
+// load-bearing for the most common way this library is used:
+//
+//   class Hub { static forRoot = smartModule({ providers: [Hub, { provide: T, useExisting: Hub }] }) }
+//
+// A plain-array contextual type makes TypeScript build the union of the
+// literal's element types and subtype-reduce it, which reads `typeof Hub`'s
+// members while `forRoot` is still being inferred — TS7022, `forRoot` becomes
+// `any`, and every `Hub.forRoot(config)` downstream answers TS2554 because the
+// factory then has both arities at once. A fixed-length tuple types each
+// element by its position and never builds that union. Measured on a
+// 335-site consumer: `[Hub]` alone is fine either way; `[Hub, anything]` in
+// the class's own static fails with the array and passes with the tuples, on
+// TypeScript 5.9 and 6.0 alike. (`[...T[]]` is no fix: TypeScript normalises
+// it back to `T[]`.)
+//
+// Past the cap the plain array takes over and a self-referencing static of
+// that length is back on the array's behaviour; sixteen is above any list
+// measured in use and above the ten the hand-written unions used to stop at.
+// spec/self-referencing-static.spec.ts holds the shape that broke.
 
 type ImportType = NonNullable<DynamicModule['imports']>[number]
 type ProviderType = NonNullable<DynamicModule['providers']>[number]
 type ExportType = NonNullable<DynamicModule['exports']>[number]
 type ControllerType = NonNullable<DynamicModule['controllers']>[number]
 
-type ImportsOptions = ImportType[]
+type ImportsOptions = ListOfUpTo<ImportType, 16>
 
-type ProvidersOptions = ProviderType[]
+type ProvidersOptions = ListOfUpTo<ProviderType, 16>
 
-type ExportsOptions = ExportType[]
+type ExportsOptions = ListOfUpTo<ExportType, 16>
 
-type ControllersOptions = ControllerType[]
+type ControllersOptions = ListOfUpTo<ControllerType, 16>
 
 //
 
