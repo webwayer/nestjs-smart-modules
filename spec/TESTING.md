@@ -114,6 +114,17 @@ await matchExpectedConfigModule(module.imports[0], {
 })
 ```
 
+### `matchExpectedSchema(factory, expected)`
+
+Validates a factory's `schema` — the whole tree — and that it is built once and is the factory's only enumerable property:
+
+```typescript
+matchExpectedSchema(factory, {
+  configs: [{ config: ConfigClass, label: 'my_label', prefix: undefined }],
+  imports: [{ label: 'other', prefix: undefined, schema: otherFactory.schema }],
+})
+```
+
 ## Patterns
 
 ### Factory Pattern (Recommended)

@@ -13,3 +13,4 @@ export type {
   SmartModuleOrFactory,
 } from './types.js'
 export type { InferSmartFactory, InferSmartFactoryProps, UnboxSmartConfigs } from './infer.js'
+export type { SmartSchema, SmartSchemaConfig, SmartSchemaImport, InferSmartSchema, WithSmartSchema } from './schema.js'
