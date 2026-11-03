@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Releases are managed by [release-please](https://github.com/googleapis/release-please); commits follow [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.2.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.1.2...v1.2.0) (2026-11-03)
+
+
+### Features
+
+* every factory carries a typed schema of the tree it was composed from ([6bf9186](https://github.com/webwayer/nestjs-smart-modules/commit/6bf91860e7cb92a0fbd3cfa8c326376c27043e2e))
+* every factory carries a typed schema of the tree it was composed from ([8ba3ef8](https://github.com/webwayer/nestjs-smart-modules/commit/8ba3ef8f00fd337406a5852a23ca895816ef86c1))
+
 ## [1.1.2](https://github.com/webwayer/nestjs-smart-modules/compare/v1.1.1...v1.1.2) (2026-09-06)
 
 
