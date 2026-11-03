@@ -119,6 +119,7 @@ This works in three steps:
 - [Recipes](#recipes)
   - [Multiple Instances of a Module](#creating-and-using-multiple-instances-of-a-module)
   - [Global Configuration Module](#creating-a-global-configuration-module-the-forroot-pattern)
+  - [Reading the Configuration Tree](#reading-the-configuration-tree-schema)
 - [Why Not `ConfigurableModuleBuilder`?](#why-not-configurablemodulebuilder)
 - [API Reference](#api-reference)
 
@@ -1192,6 +1193,71 @@ export class AsyncAppModule {
 }
 ```
 
+### Reading the Configuration Tree (`schema`)
+
+Every factory `smartModule` returns carries a `schema`: the tree it was composed from, read without calling the factory. Each node lists its configuration classes — the class itself, with the `label` and `prefix` it is read under — and the schema of every smart import beside the namespace it was imported with. It is typed like the factory's argument, so the classes in it are the exact classes you wrote.
+
+That is enough to answer a question about the whole application before it starts: which settings it reads, which classes carry a marker of your own, what every default is.
+
+**Example: every setting an application reads**
+
+```typescript
+import { Injectable } from '@nestjs/common'
+import { smartModule } from 'nestjs-smart-modules'
+import type { SmartSchema } from 'nestjs-smart-modules'
+
+export class DatabaseConfig {
+  static label = 'database' as const
+  url?: string = 'postgres://localhost:5432'
+  poolSize?: number = 10
+}
+
+@Injectable()
+export class DatabaseService {
+  static smartModule = smartModule({
+    smartConfigs: [DatabaseConfig],
+    providers: [DatabaseService],
+    exports: [DatabaseService],
+  })
+}
+
+export class ReportsConfig {
+  static label = 'reports' as const
+  pageSize?: number = 50
+}
+
+@Injectable()
+export class ReportsService {
+  static smartModule = smartModule({
+    smartConfigs: [ReportsConfig],
+    smartImports: [DatabaseService.smartModule],
+    providers: [ReportsService],
+  })
+}
+
+// Each setting as its path in the configuration object, with its default.
+export function settingsOf(schema: SmartSchema, path: string[] = []): Record<string, unknown> {
+  const own = schema.configs.map(({ config, label, prefix }) => {
+    const at = label ? [...path, label] : path
+    return Object.entries(new config()).map(([key, value]) => [[...at, `${prefix ?? ''}${key}`].join('.'), value])
+  })
+  const imported = schema.imports.map(({ label, schema: child }) =>
+    child ? Object.entries(settingsOf(child, label ? [...path, label] : path)) : [],
+  )
+  return Object.fromEntries([...own, ...imported].flat())
+}
+
+settingsOf(ReportsService.smartModule.schema)
+// { 'reports.pageSize': 50, 'database.url': 'postgres://localhost:5432', 'database.poolSize': 10 }
+```
+
+Two things the schema does not hold:
+
+- **What a definition factory returns.** `smartModule(Config, (imports, config) => ({ … }))` contributes only its inline classes, since the `smartConfigs` and `smartImports` its function returns exist only once the function runs.
+- **A plain factory's tree.** An import `smartModule` did not build — a hand-written `forRoot`, say — appears with `schema: undefined`.
+
+`new config()` lists only the properties a class initializes, so a property with no default appears once it has one — or, with `useDefineForClassFields`, as `undefined`.
+
 ## Why Not `ConfigurableModuleBuilder`?
 
 NestJS ships `ConfigurableModuleBuilder` for building configurable modules, and it is a fine choice for a _single_ module with options. `smartModule` targets a different problem — composing an application out of many configurable pieces:
@@ -1267,6 +1333,15 @@ type SmartImport =
       label?: string // Namespace configuration
       prefix?: string // Prefix configuration
     }
+```
+
+**The `schema` property:**
+
+```typescript
+interface SmartSchema {
+  configs: { config: ConfigClass; label?: string; prefix?: string }[] // In instantiation order, inline first
+  imports: { label?: string; prefix?: string; schema: SmartSchema | undefined }[] // undefined: not a smartModule
+}
 ```
 
 ### Configuration Class Requirements

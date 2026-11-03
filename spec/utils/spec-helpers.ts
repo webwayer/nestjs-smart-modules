@@ -1,8 +1,14 @@
 import type { DynamicModule, InjectionToken } from '@nestjs/common'
 import type { AsyncParams } from '../../src/types'
+import type { SmartSchema } from '../../src/schema'
 
 // Type testing utilities
-export type TypeTest<T, U> = T extends U ? (U extends T ? true : false) : false
+// A factory's call signature alone: every factory also carries `schema`,
+// which spec/schema.spec.ts asserts on its own, so a signature test reads
+// the same with or without it.
+type CallSignature<T> = T extends { readonly schema: unknown } & ((...args: infer A) => infer R) ? (...args: A) => R : T
+
+export type TypeTest<T, U> = CallSignature<T> extends U ? (U extends CallSignature<T> ? true : false) : false
 
 export function typeAssert<_T extends true>() {
   // This function is used for compile-time type checking
@@ -135,4 +141,13 @@ export function matchExpectedConfigModule<TValue = Record<string, unknown>>(
   } else {
     expect(provider.useValue).toEqual(expected.value)
   }
+}
+
+// Helper to match a factory's schema: the whole tree, and that it is built
+// once — every read returns the same object — and is the factory's only
+// enumerable property.
+export function matchExpectedSchema(factory: { readonly schema: SmartSchema }, expected: SmartSchema) {
+  expect(factory.schema).toEqual(expected)
+  expect(factory.schema).toBe(factory.schema)
+  expect(Object.keys(factory)).toEqual(['schema'])
 }

@@ -2,7 +2,7 @@
 
 > A lightweight, type-safe library that simplifies NestJS module configuration: services become composable smart modules, configuration merges across the dependency tree into a single typed object provided at the application root. Zero runtime dependencies; dual CJS/ESM builds; peer NestJS ^8 || ^9 || ^10 || ^11.
 
-Key semantics: every smart module factory call creates its own DynamicModule (own provider instances per importing branch); the merged configuration is delivered identically to all of them. Async configuration follows the registerAsync convention (imports/inject/useFactory) and resolves inject from non-global modules.
+Key semantics: every smart module factory call creates its own DynamicModule (own provider instances per importing branch); the merged configuration is delivered identically to all of them. Async configuration follows the registerAsync convention (imports/inject/useFactory) and resolves inject from non-global modules. Every factory carries a typed `schema`: the tree of config classes (with their label and prefix) and smart imports it was composed from, read without calling the factory; a definition factory contributes only its inline config classes.
 
 - [README](https://github.com/webwayer/nestjs-smart-modules/blob/main/README.md): quick start, labels/prefixes/tokens, composition, async configuration, factory pattern, recipes, instance semantics
 - [API Reference](https://webwayer.github.io/nestjs-smart-modules/): generated TypeDoc for the public API

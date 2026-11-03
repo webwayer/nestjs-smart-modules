@@ -7,9 +7,18 @@ import {
   moduleFromSmartImport,
 } from './modules.js'
 import { appendImports, createNamedClass } from './utils/helpers.js'
-import type { AsyncParams, AnySmartConfig, AnySmartImport, SmartModuleOrFactory } from './types.js'
+import type {
+  AsyncParams,
+  AnySmartConfig,
+  AnySmartImport,
+  SmartModule,
+  SmartModuleFactory,
+  SmartModuleOrFactory,
+} from './types.js'
 import { isAsyncParams, isSmartConfig, isSmartModule } from './types.js'
 import type { InferSmartFactory } from './infer.js'
+import { attachSchema } from './schema.js'
+import type { InferSmartSchema, WithSmartSchema } from './schema.js'
 
 /**
  * Turns a module definition into a configurable module factory.
@@ -58,12 +67,27 @@ export function smartModule<
   T extends AnySmartConfig[] = [],
   TC extends AnySmartConfig[] = [],
   TI extends AnySmartImport[] = [],
->(...args: [...T, SmartModuleOrFactory<[...T], [...TC], [...TI]>]): InferSmartFactory<[...T, ...TC, ...TI]>
+>(
+  ...args: [...T, SmartModule<[...TC], [...TI]>]
+): InferSmartFactory<[...T, ...TC, ...TI]> & WithSmartSchema<InferSmartSchema<[...T, ...TC], [...TI]>>
+/**
+ * Definition factory: the returned factory's `schema` holds only the inline
+ * config classes, since what the function returns exists only once it runs.
+ */
+export function smartModule<
+  T extends AnySmartConfig[] = [],
+  TC extends AnySmartConfig[] = [],
+  TI extends AnySmartImport[] = [],
+>(
+  ...args: [...T, SmartModuleFactory<[...T], [...TC], [...TI]>]
+): InferSmartFactory<[...T, ...TC, ...TI]> & WithSmartSchema<InferSmartSchema<[...T], []>>
 /**
  * Definition without smart configs or smart imports: the returned factory
  * takes no configuration argument.
  */
-export function smartModule(moduleOrModuleDefinitionFn: SmartModuleOrFactory<[], [], []>): () => DynamicModule
+export function smartModule(
+  moduleOrModuleDefinitionFn: SmartModuleOrFactory<[], [], []>,
+): (() => DynamicModule) & WithSmartSchema<InferSmartSchema<[], []>>
 export function smartModule(...args: unknown[]) {
   const inlineSmartConfigs = args.slice(0, args.length - 1) as AnySmartConfig[]
   const smartModuleOrFactory = args[args.length - 1] as SmartModuleOrFactory<
@@ -72,7 +96,7 @@ export function smartModule(...args: unknown[]) {
     AnySmartImport[]
   >
 
-  return function (this: { name?: string } | undefined, arg: object | AsyncParams<object>) {
+  const factory = function (this: { name?: string } | undefined, arg: object | AsyncParams<object>) {
     const module = createNamedClass((this?.name || '') + 'SmartModule')
     const inlineSmartConfigModules = inlineSmartConfigs.map(c => moduleFromSmartConfig(c, arg))
 
@@ -123,4 +147,12 @@ export function smartModule(...args: unknown[]) {
       ...smartImportModules,
     ])
   }
+
+  const definition = isSmartModule(smartModuleOrFactory) ? smartModuleOrFactory : {}
+
+  return attachSchema(
+    factory,
+    [...inlineSmartConfigs, ...(definition.smartConfigs ?? [])],
+    definition.smartImports ?? [],
+  )
 }
