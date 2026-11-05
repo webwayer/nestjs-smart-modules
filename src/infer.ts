@@ -52,11 +52,18 @@ type InferExtendedSmartImport<T> = T extends ExtendedSmartImport & Labeled<infer
   ? LabelProps<PrefixProps<InferSmartImport<T['smartImport']>, P>, L>
   : T extends ExtendedSmartImport & Labeled<infer L>
     ? LabelProps<InferSmartImport<T['smartImport']>, L>
-    : T extends ExtendedSmartImport & Prefixed<infer P>
-      ? PrefixProps<InferSmartImport<T['smartImport']>, P>
-      : T extends ExtendedSmartImport
-        ? InferSmartImport<T['smartImport']>
-        : never
+    : T extends ExtendedSmartImport
+      ? // A factory with no parameter has nothing to contribute: `Spread` intersects this with
+        // the other entries, and `X & ({} | null)` is `X`. Alone it is `{} | null`, where `null`
+        // keeps `useFactory: () => null` compiling. An optional parameter stays typed, which is
+        // why this asks about `Parameters` and not about `() => DynamicModule`.
+        Parameters<T['smartImport']> extends []
+        ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- see above
+          {} | null
+        : T extends Prefixed<infer P>
+          ? PrefixProps<InferSmartImport<T['smartImport']>, P>
+          : InferSmartImport<T['smartImport']>
+      : never
 
 type UnboxSmartConfigProps<T> = T extends SmartConfig<infer U> | ExtendedSmartConfig<infer U> ? Unbox<U> : null
 // A homomorphic mapped type over a tuple maps element by element with no recursion,
