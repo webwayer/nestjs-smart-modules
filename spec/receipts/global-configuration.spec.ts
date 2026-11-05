@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { Injectable } from '@nestjs/common'
 import type { DynamicModule } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
@@ -159,7 +160,7 @@ describe('Recipes: Creating a Global Configuration Module (the `forRoot` pattern
     })
       .overrideProvider(ConfigService)
       .useValue({
-        get: jest.fn().mockImplementation((key: string) => {
+        get: jest.fn((key: string) => {
           if (key === 'APP_NAME') return 'My Async App'
           if (key === 'NODE_ENV') return 'production'
           return undefined

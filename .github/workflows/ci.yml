@@ -40,36 +40,49 @@ jobs:
       - run: npm run validate
 
   # The full compatibility grid: every supported NestJS major against every
-  # Node line it supports. The only hole is Nest 11 on the Node 18 floor —
-  # Nest 11 itself requires Node >= 20.
+  # Node line it supports. The only holes are Nest 11 and 12 on the Node 18
+  # floor — both require Node >= 20 themselves.
   compat:
     name: nest ${{ matrix.nest }} / node ${{ matrix.node }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        nest: ['8', '9', '10', '11']
+        nest: ['8', '9', '10', '11', '12']
         node: ['18.16.0', '20', '22', '24', '26']
         exclude:
           - nest: '11'
+            node: '18.16.0'
+          - nest: '12'
             node: '18.16.0'
         # Companion versions per major; an include entry that matches a combo
         # by `nest` extends every cell of that major. --legacy-peer-deps for
         # 8/9: their reflect-metadata ^0.1 peer conflicts with the installed
         # 0.2 (runtime compatible), and @nestjs/config@2 predates newer peers.
+        # test:esm for 12: NestJS is pure ESM from there on, which Jest's
+        # CommonJS runtime cannot load, so those cells run Jest in native ESM
+        # mode against NestJS's real module graph.
         include:
           - nest: '8'
             config: '2'
             flags: '--legacy-peer-deps'
+            test: 'test'
           - nest: '9'
             config: '2'
             flags: '--legacy-peer-deps'
+            test: 'test'
           - nest: '10'
             config: '3'
             flags: ''
+            test: 'test'
           - nest: '11'
             config: '4'
             flags: ''
+            test: 'test'
+          - nest: '12'
+            config: '12'
+            flags: ''
+            test: 'test:esm'
     steps:
       - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
@@ -83,7 +96,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm install --no-save ${{ matrix.flags }} @nestjs/common@${{ matrix.nest }} @nestjs/core@${{ matrix.nest }} @nestjs/testing@${{ matrix.nest }} @nestjs/platform-express@${{ matrix.nest }} @nestjs/config@${{ matrix.config }}
-      - run: npm test
+      # Jest only transpiles and `validate` typechecks on the lockfile NestJS,
+      # so nothing else would catch a break in the v12 type declarations.
+      - if: matrix.nest == '12'
+        run: npm run typecheck
+      - run: npm run ${{ matrix.test }}
 
   package:
     name: package
@@ -145,26 +162,3 @@ jobs:
         with:
           persist-credentials: false
       - uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
-
-  # v12 pre-release (pure ESM), on the dev Node only. Alpha peer deps still
-  # reference ^11, hence --legacy-peer-deps; Jest cannot require(esm) yet, so
-  # failures are expected until the v12 RC (issue 2) and surface as a warning
-  # annotation instead of a red check.
-  nest-next:
-    name: nest next
-    runs-on: ubuntu-latest
-    steps:
-      - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
-        with:
-          egress-policy: audit
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 26
-          cache: npm
-      - run: npm ci
-      - run: npm install --no-save --legacy-peer-deps @nestjs/common@next @nestjs/core@next @nestjs/testing@next @nestjs/platform-express@next @nestjs/config@next
-      - run: |
-          npm test || echo "::warning title=NestJS next compatibility::npm test fails against @nestjs/common@next — expected until the v12 RC (see issue 2)"

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import type { DynamicModule } from '@nestjs/common'
 import { smartModule } from '../src/smartModule'
 import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'

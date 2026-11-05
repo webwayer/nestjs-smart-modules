@@ -17,6 +17,7 @@ npm run validate
 | Script                      | What it does                                       |
 | --------------------------- | -------------------------------------------------- |
 | `npm test` / `test:watch`   | Jest test suite                                    |
+| `npm run test:esm`          | The suite in native ESM mode, as NestJS 12 needs   |
 | `npm run coverage`          | Coverage with a 100% threshold (receipts excluded) |
 | `npm run lint` / `lint:fix` | ESLint 10 with type-checked rules                  |
 | `npm run format`            | Prettier over the whole repo                       |
@@ -34,6 +35,6 @@ Test conventions live in [spec/TESTING.md](spec/TESTING.md). In short: structure
 
 ## Pull requests
 
-- Branch from `main`; PRs need the required checks green: `validate`, `package`, and every cell of the `nest N / node V` compatibility grid (NestJS 8-11 × Node 18.16-26, minus Nest 11 on Node 18).
+- Branch from `main`; PRs need the required checks green: `validate`, `package`, and every cell of the `nest N / node V` compatibility grid (NestJS 8-12 × Node 18.16-26, minus Nest 11 and 12 on Node 18).
 - The `nest next` job tracks the upcoming NestJS major; its failures surface as a warning annotation instead of a red check.
 - Releases are cut by merging the release-please Release PR — contributors never publish manually.
