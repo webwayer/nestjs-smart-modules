@@ -131,11 +131,11 @@ npm install nestjs-smart-modules
 
 ## Compatibility
 
-| nestjs-smart-modules | NestJS (peer)                  | Node.js      |
-| -------------------- | ------------------------------ | ------------ |
-| 1.x                  | `^8 \|\| ^9 \|\| ^10 \|\| ^11` | `>= 18.16.0` |
+| nestjs-smart-modules | NestJS (peer)                           | Node.js      |
+| -------------------- | --------------------------------------- | ------------ |
+| 1.x                  | `^8 \|\| ^9 \|\| ^10 \|\| ^11 \|\| ^12` | `>= 18.16.0` |
 
-CI runs the **full compatibility grid** — every supported NestJS major against every Node line it supports: Nest 8/9/10 on Node 18.16 (the declared floor), 20, 22, 24 and 26, and Nest 11 on Node 20+ (its own engines requirement). NestJS 12 (`@next`) is tracked by a warning-only job until its RC. The package ships dual builds: CommonJS for `require()` and ESM for `import`. Development happens on the Node version pinned in `.nvmrc`. Built with TypeScript 5.8; public factory type inference is verified in CI down to TypeScript 5.0.
+CI runs the **full compatibility grid** — every supported NestJS major against every Node line it supports: Nest 8/9/10 on Node 18.16 (the declared floor), 20, 22, 24 and 26, and Nest 11 and 12 on Node 20+ (their own engines requirement). The package ships dual builds: CommonJS for `require()` and ESM for `import`. NestJS 12 is pure ESM, and works with either: from ESM directly, and from CommonJS through Node's `require(esm)` (Node 20.19+ or 22.12+). For a CommonJS project compiled by TypeScript, that means `module: nodenext` on TypeScript 5.8+ or classic `module: commonjs`; `module: node16` rejects importing NestJS 12 from CommonJS. TypeScript itself deprecated `moduleResolution: node10` in 6.0 and removed it in 7.0, so leave that option out there. Development happens on the Node version pinned in `.nvmrc`. Built with TypeScript 5.8. CI checks the published type declarations against every supported NestJS major on TypeScript 5.0, 5.8, 5.9, 6.0 and 7.0.
 
 ## Basic Usage
 

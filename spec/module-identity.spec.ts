@@ -7,7 +7,7 @@ import { typeAssert, TypeTest, ExpectedFactoryType, matchExpectedModuleStructure
 // every smartModule factory call produces its own DynamicModule, so each
 // importing branch gets its OWN service instance while the merged
 // configuration is delivered identically to all of them. This holds on
-// NestJS 10 and 11 under both module id algorithms (deep-hash / reference) —
+// NestJS 10, 11 and 12 under both module id algorithms (deep-hash / reference) —
 // the generated module class is a fresh named class per call, so modules are
 // never deduplicated by the framework.
 
