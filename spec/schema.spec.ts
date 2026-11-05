@@ -178,7 +178,7 @@ describe('Factory Schema', () => {
     it('should leave the module the factory builds as it was', () => {
       const factory = smartModule({ smartConfigs: [LabeledConfig] })
 
-      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ db: { poolSize?: number } }>>>()
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ db?: { poolSize?: number } }>>>()
 
       const module = factory({ db: { poolSize: 5 } })
 
