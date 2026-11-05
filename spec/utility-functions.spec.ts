@@ -56,6 +56,11 @@ describe('Utility Functions', () => {
 
       // Test with no configuration object at all
       expect(pickLabeledAndPrefixed(undefined)).toEqual({})
+
+      // Test with the label missing, null, or missing beside a prefix
+      expect(pickLabeledAndPrefixed({}, 'labeled')).toEqual({})
+      expect(pickLabeledAndPrefixed({ labeled: null }, 'labeled')).toEqual({})
+      expect(pickLabeledAndPrefixed({}, 'labeled', 'prefix_')).toEqual({})
     })
 
     it('should test appendImports with existing imports', () => {
