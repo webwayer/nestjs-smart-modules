@@ -416,6 +416,134 @@ describe('Optional Labels', () => {
     })
   })
 
+  describe('Prefixes', () => {
+    it('should leave a prefixed config without a label optional field by field', () => {
+      class PlainConfig {
+        timeZone?: string = 'UTC'
+      }
+
+      const factory = smartModule({ smartConfigs: [{ smartConfig: PlainConfig, prefix: 'tz_' as const }] })
+
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ tz_timeZone?: string }>>>()
+
+      matchExpectedConfigModule(factory({}).imports![0], {
+        name: 'PlainConfigSmartConfigModule',
+        value: { timeZone: 'UTC' },
+      })
+    })
+
+    it('should keep an optional label optional under a prefixed import', () => {
+      const inner = smartModule({ smartConfigs: [TuningConfig] })
+      const factory = smartModule({ smartImports: [{ smartImport: inner, prefix: 'app_' as const }] })
+
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ app_tuning?: { timeZone?: string } }>>>()
+
+      const module = factory({})
+
+      matchExpectedModuleStructure(module, { imports: 1 })
+
+      const importedModule = module.imports![0] as DynamicModule
+
+      matchExpectedModuleStructure(importedModule, { imports: 1 })
+      matchExpectedConfigModule(importedModule.imports![0], {
+        name: 'TuningConfigSmartConfigModule',
+        value: { timeZone: 'UTC' },
+      })
+
+      const statedModule = factory({ app_tuning: { timeZone: 'Asia/Tokyo' } }).imports![0] as DynamicModule
+
+      matchExpectedConfigModule(statedModule.imports![0], {
+        name: 'TuningConfigSmartConfigModule',
+        value: { timeZone: 'Asia/Tokyo' },
+      })
+    })
+
+    it('should stop at any level of a labelled and prefixed import', () => {
+      const inner = smartModule({ smartConfigs: [TuningConfig] })
+      const factory = smartModule({
+        smartImports: [{ smartImport: inner, label: 'inner' as const, prefix: 'app_' as const }],
+      })
+
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ inner?: { app_tuning?: { timeZone?: string } } }>>>()
+
+      const module = factory({})
+
+      matchExpectedModuleStructure(module, { imports: 1 })
+
+      const importedModule = module.imports![0] as DynamicModule
+
+      matchExpectedModuleStructure(importedModule, { imports: 1 })
+      matchExpectedConfigModule(importedModule.imports![0], {
+        name: 'TuningConfigSmartConfigModule',
+        value: { timeZone: 'UTC' },
+      })
+
+      const emptyModule = factory({ inner: {} }).imports![0] as DynamicModule
+
+      matchExpectedConfigModule(emptyModule.imports![0], {
+        name: 'TuningConfigSmartConfigModule',
+        value: { timeZone: 'UTC' },
+      })
+
+      const statedModule = factory({ inner: { app_tuning: { timeZone: 'Asia/Tokyo' } } }).imports![0] as DynamicModule
+
+      matchExpectedConfigModule(statedModule.imports![0], {
+        name: 'TuningConfigSmartConfigModule',
+        value: { timeZone: 'Asia/Tokyo' },
+      })
+    })
+
+    it('should keep a required label required under a prefixed import', () => {
+      const inner = smartModule({ smartConfigs: [DatabaseConfig] })
+      const factory = smartModule({ smartImports: [{ smartImport: inner, prefix: 'app_' as const }] })
+
+      typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ app_database: { url: string; poolSize?: number } }>>>()
+
+      const module = factory({ app_database: { url: 'postgres://db' } })
+
+      matchExpectedModuleStructure(module, { imports: 1 })
+
+      const importedModule = module.imports![0] as DynamicModule
+
+      matchExpectedModuleStructure(importedModule, { imports: 1 })
+      matchExpectedConfigModule(importedModule.imports![0], {
+        name: 'DatabaseConfigSmartConfigModule',
+        value: { url: 'postgres://db', poolSize: 10 },
+      })
+
+      // @ts-expect-error the required label must be stated under its prefix
+      factory({})
+    })
+
+    it('should keep a required label required under a labelled and prefixed import', () => {
+      const inner = smartModule({ smartConfigs: [DatabaseConfig] })
+      const factory = smartModule({
+        smartImports: [{ smartImport: inner, label: 'inner' as const, prefix: 'app_' as const }],
+      })
+
+      typeAssert<
+        TypeTest<typeof factory, ExpectedFactoryType<{ inner: { app_database: { url: string; poolSize?: number } } }>>
+      >()
+
+      const module = factory({ inner: { app_database: { url: 'postgres://db' } } })
+
+      matchExpectedModuleStructure(module, { imports: 1 })
+
+      const importedModule = module.imports![0] as DynamicModule
+
+      matchExpectedModuleStructure(importedModule, { imports: 1 })
+      matchExpectedConfigModule(importedModule.imports![0], {
+        name: 'DatabaseConfigSmartConfigModule',
+        value: { url: 'postgres://db', poolSize: 10 },
+      })
+
+      // @ts-expect-error the outer label must be stated
+      factory({})
+      // @ts-expect-error the required label must be stated inside the outer one
+      factory({ inner: {} })
+    })
+  })
+
   describe('Async Configuration', () => {
     it('should default a label the async factory leaves out', async () => {
       const factory = smartModule({ smartConfigs: [TuningConfig] })
