@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Releases are managed by [release-please](https://github.com/googleapis/release-please); commits follow [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.3.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.2.0...v1.3.0) (2026-11-05)
+
+
+### Features
+
+* support NestJS 12 ([ccdef49](https://github.com/webwayer/nestjs-smart-modules/commit/ccdef491f348fea4e0f376f23e35e445803a1bb5))
+* support NestJS 12 ([fd6a4c0](https://github.com/webwayer/nestjs-smart-modules/commit/fd6a4c006d85a8abe1193abdbaab215060a9c6a5)), closes [#2](https://github.com/webwayer/nestjs-smart-modules/issues/2)
+
 ## [1.2.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.1.2...v1.2.0) (2026-11-03)
 
 
