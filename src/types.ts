@@ -29,6 +29,9 @@ export function isAsyncParams<T>(o: T | AsyncParams<T>): o is AsyncParams<T> {
  * the configuration shape (optional properties may carry defaults); static
  * `label`, `prefix` and `token` customize namespacing and the injection
  * token.
+ *
+ * Declare `label` and `prefix` with `as const`. Annotated `static label?: string`,
+ * a class types as having none, while at run time it still reads under the value.
  */
 export interface SmartConfig<T = any> extends Type<T> {
   /** Prefixes every property name in the merged configuration (`db_port`). */

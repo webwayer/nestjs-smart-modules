@@ -236,7 +236,9 @@ To ensure this feature works correctly, always define your smart modules on a na
 
 Both labels and prefixes solve the same problem: **avoiding configuration property conflicts**. When composing multiple modules or using multiple instances of the same module, you need ways to separate their configurations.
 
-> **Important:** When defining a `label` or `prefix` inline, always use `as const`. This tells TypeScript to treat it as a literal type, which is essential for correct type inference.
+> **Important:** When defining a `label` or `prefix`, inline or as a `static` property, always use `as const`. This tells TypeScript to treat it as a literal type, which is essential for correct type inference.
+>
+> Never annotate one as `static label?: string = 'x'` or `static prefix?: string = 'x_'`. To TypeScript that has no label or prefix, so it accepts the fields flat, while at run time the class still reads them under the label or prefix and your values never reach it.
 >
 > **Note on `smartImports`:** Applying a `label` or `prefix` to a `smartImport` only affects how configuration is passed down to it. It does **not** change the providers or injection tokens within the imported module itself.
 
@@ -1360,9 +1362,9 @@ export class MyConfig {
   defaultProp?: number = 42
 
   // Static configuration
-  static label?: string = 'myConfig'
-  static prefix?: string = 'my_'
-  static token?: string = 'MY_CONFIG_TOKEN'
+  static label = 'myConfig' as const
+  static prefix = 'my_' as const
+  static token = 'MY_CONFIG_TOKEN'
 }
 ```
 
