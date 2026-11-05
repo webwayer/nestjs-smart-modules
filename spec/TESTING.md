@@ -240,6 +240,14 @@ npm test -- spec/receipts   # Run only receipts
 npm run coverage           # Run coverage (excludes receipts)
 ```
 
+### Other TypeScript versions
+
+Jest only transpiles, so the type assertions in specs are enforced by a typecheck. `check:types` runs them against the declarations the package publishes, on any TypeScript and whichever NestJS is installed; it needs a prior `npm run build`:
+
+```bash
+npm run check:types -- 7.0
+```
+
 ### NestJS 12 (native ESM)
 
 NestJS 12 is pure ESM, which Jest's CommonJS runtime cannot load, so its CI cells run the same suite in native ESM mode. The lockfile stays on NestJS 11; to reproduce a cell locally, install v12 without saving it, then run `test:esm` (a fresh `npm ci` puts the lockfile versions back):

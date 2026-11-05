@@ -102,6 +102,50 @@ jobs:
         run: npm run typecheck
       - run: npm run ${{ matrix.test }}
 
+  # What each supported NestJS major looks like through each TypeScript a
+  # consumer may compile with: the floor, the one this repo builds with, and
+  # the newest of each major. TypeScript only matters at compile time, so this
+  # is its own grid rather than a third axis on the one above, and it checks
+  # the published declarations rather than the sources.
+  types:
+    name: types / nest ${{ matrix.nest }} / ts ${{ matrix.ts }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        nest: ['8', '9', '10', '11', '12']
+        ts: ['5.0', '5.8', '5.9', '6.0', '7.0']
+        include:
+          - nest: '8'
+            config: '2'
+            flags: '--legacy-peer-deps'
+          - nest: '9'
+            config: '2'
+            flags: '--legacy-peer-deps'
+          - nest: '10'
+            config: '3'
+            flags: ''
+          - nest: '11'
+            config: '4'
+            flags: ''
+          - nest: '12'
+            config: '12'
+            flags: ''
+    steps:
+      - uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save ${{ matrix.flags }} @nestjs/common@${{ matrix.nest }} @nestjs/core@${{ matrix.nest }} @nestjs/testing@${{ matrix.nest }} @nestjs/platform-express@${{ matrix.nest }} @nestjs/config@${{ matrix.config }}
+      - run: npm run check:types -- ${{ matrix.ts }}
+
   package:
     name: package
     runs-on: ubuntu-latest
