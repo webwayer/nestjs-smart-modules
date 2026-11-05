@@ -1,6 +1,7 @@
 import type { DynamicModule } from '@nestjs/common'
 import { Injectable } from '@nestjs/common'
 import { smartModule } from '../src/smartModule'
+import type { AsyncParams } from '../src/types'
 import type { TypeTest, ExpectedFactoryType } from './utils/spec-helpers'
 import { matchExpectedModuleStructure, matchExpectedConfigModule, typeAssert } from './utils/spec-helpers'
 
@@ -362,6 +363,57 @@ describe('Optional Labels', () => {
       matchExpectedConfigModule(importedModule.imports![0], {
         name: 'TuningConfigSmartConfigModule',
         value: { timeZone: 'UTC' },
+      })
+    })
+
+    describe('Plain Factories', () => {
+      class PlainModule {}
+
+      it('should keep the label of a factory that does not take AsyncParams unusable rather than optional', () => {
+        function forRoot(_options: { url: string }): DynamicModule {
+          return { module: PlainModule }
+        }
+
+        const factory = smartModule({ smartImports: [{ smartImport: forRoot, label: 'plain' as const }] })
+
+        typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ plain: never }>>>()
+
+        // @ts-expect-error `url` must not go missing because the label did
+        const module = factory({})
+
+        matchExpectedModuleStructure(module, { imports: 1 })
+      })
+
+      it('should keep the label of a factory taking AsyncParams required when it needs a field', () => {
+        function forRoot(_options: { url: string } | AsyncParams<{ url: string }>): DynamicModule {
+          return { module: PlainModule }
+        }
+
+        const factory = smartModule({ smartImports: [{ smartImport: forRoot, label: 'plain' as const }] })
+
+        typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ plain: { url: string } }>>>()
+
+        // @ts-expect-error `url` must not go missing because the label did
+        const module = factory({})
+
+        matchExpectedModuleStructure(module, { imports: 1 })
+      })
+
+      it('should hand a factory an empty object for a missing optional label', () => {
+        const received: unknown[] = []
+
+        function forRoot(options: { url?: string } | AsyncParams<{ url?: string }>): DynamicModule {
+          received.push(options)
+
+          return { module: PlainModule }
+        }
+
+        const factory = smartModule({ smartImports: [{ smartImport: forRoot, label: 'plain' as const }] })
+
+        typeAssert<TypeTest<typeof factory, ExpectedFactoryType<{ plain?: { url?: string } }>>>()
+
+        matchExpectedModuleStructure(factory({}), { imports: 1 })
+        expect(received).toEqual([{}])
       })
     })
 

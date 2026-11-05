@@ -334,7 +334,7 @@ AppService.smartModule({ database: { url: 'postgres://localhost:5432' } }) // `t
 AppService.smartModule({}) // compile error: `database` is missing
 ```
 
-> **Note:** Only the compiler can enforce a required label, because a field with no initializer leaves nothing in the class at run time. An untyped caller that leaves out `database` gets an instance with no `url` rather than an error, just as with an unlabelled class.
+> **Note:** Only the compiler can enforce a required label, because a field with no initializer leaves nothing in the class at run time. An untyped caller that leaves out `database` gets an instance with no `url` rather than an error, just as with an unlabelled class. The same goes for a configuration typed `any`, such as the result of `ConfigService.get()` in a `useFactory`, so validate those yourself. A misspelt optional label is caught in an object literal, but not in a variable or a `useFactory` result that also has another valid key.
 
 ### Prefixes: Flattened Property Naming
 

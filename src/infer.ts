@@ -23,16 +23,20 @@ interface Prefixed<P extends string> {
 type PrefixProps<T, P extends string> = {
   [K in keyof T as K extends string ? `${P}${K}` : never]: T[K]
 }
-// A label is optional exactly when nothing under it has to be stated: `{}` would do for
-// its value, which also holds for a labelled import whose nested labels all came out
-// optional here, or it is an import with no configuration at all (`null`, from
-// `InferSmartImport`). A required field fails both checks and keeps its key required.
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- {} is what the check is about
-type LabelProps<T, L extends string> = {} extends T
-  ? Partial<Record<L, T>>
+// Nothing under a label has to be stated when `{}` would do for its value, which also holds
+// for a labelled import whose nested labels all came out optional here, or when it is an
+// import with no configuration at all (`null`, from `InferSmartImport`). `never` comes first:
+// it is what a plain factory that does not take `AsyncParams` infers to, whatever it
+// requires, and it would otherwise pass as `null`.
+type NothingRequired<T> = [T] extends [never]
+  ? false
   : [T] extends [null]
-    ? Partial<Record<L, T>>
-    : Record<L, T>
+    ? true
+    : // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- {} is what the check is about
+      {} extends T
+      ? true
+      : false
+type LabelProps<T, L extends string> = NothingRequired<T> extends true ? Partial<Record<L, T>> : Record<L, T>
 
 type InferSmartConfig<T> = T extends SmartConfig<infer U> & Labeled<infer L> & Prefixed<infer P>
   ? LabelProps<PrefixProps<U, P>, L>
