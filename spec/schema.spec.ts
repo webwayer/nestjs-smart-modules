@@ -86,6 +86,19 @@ describe('Factory Schema', () => {
       })
     })
 
+    it('should read the class prefix where an inline entry states none', () => {
+      const factory = smartModule({
+        smartConfigs: [{ smartConfig: PrefixedConfig }],
+      })
+
+      typeAssert<TypeTest<typeof factory.schema, SmartSchema<[SmartSchemaConfig<typeof PrefixedConfig>], []>>>()
+
+      matchExpectedSchema(factory, {
+        configs: [{ config: PrefixedConfig, label: undefined, prefix: 'cache_' }],
+        imports: [],
+      })
+    })
+
     it('should put inline configuration classes first, in the order they are instantiated', () => {
       const factory = smartModule(LabeledConfig, { smartConfigs: [PlainConfig] })
 

@@ -126,6 +126,22 @@ describe('Utility Functions', () => {
       }).toThrow(/not valid smart import base for module/)
     })
 
+    it('should throw the same error for an extended import whose smartImport is not a factory', () => {
+      const invalidImportBase = { smartImport: 'not a factory' } as any
+
+      expect(() => {
+        moduleFromSmartImport(invalidImportBase, { test: 'value' })
+      }).toThrow(/not valid smart import base for module/)
+    })
+
+    it('should throw the same error for an extended config whose smartConfig is not a class', () => {
+      const invalidConfigBase = { smartConfig: 'not a class' } as any
+
+      expect(() => {
+        moduleFromSmartConfig(invalidConfigBase, { test: 'value' })
+      }).toThrow(/not valid smart config base for module/)
+    })
+
     it('should throw error for invalid smart config base', () => {
       const invalidConfigBase = { notAValidConfig: true } as any
 

@@ -26,6 +26,32 @@ export function pickLabeledAndPrefixed(obj: object | undefined, label?: string, 
   return removePrefix(filterByPrefix(pickLabel((obj ?? {}) as PlainObject, label), prefix), prefix)
 }
 
+const namespacedConfigs = new WeakMap<object, Map<string, object>>()
+
+/**
+ * The configuration an import namespaced by `label` and `prefix` is handed,
+ * made once per source configuration and namespace. A shared module is keyed
+ * by the configuration object it receives, so two imports under one namespace
+ * must receive the same object, not two equal ones.
+ */
+export function namespacedOnce<T extends object>(
+  source: object,
+  label: string | undefined,
+  prefix: string | undefined,
+  make: () => T,
+): T {
+  const namespace = JSON.stringify([label, prefix])
+  const made = namespacedConfigs.get(source) ?? new Map<string, object>()
+
+  namespacedConfigs.set(source, made)
+
+  if (!made.has(namespace)) {
+    made.set(namespace, make())
+  }
+
+  return made.get(namespace) as T
+}
+
 export function appendImports(module: DynamicModule, imports: DynamicModule[]): DynamicModule {
   // Never mutate the existing imports: `module` is spread from the caller's
   // module definition, so `module.imports` can be the definition's own array —

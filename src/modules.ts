@@ -1,4 +1,4 @@
-import { pickLabeledAndPrefixed, createNamedClass } from './utils/helpers.js'
+import { pickLabeledAndPrefixed, createNamedClass, namespacedOnce } from './utils/helpers.js'
 import type { AsyncParams, AnySmartConfig, AnySmartImport, ExtendedSmartConfig, SmartConfig } from './types.js'
 import { isAsyncParams, isExtendedSmartConfig, isExtendedSmartImport, isSmartConfig, isSmartImport } from './types.js'
 
@@ -80,16 +80,22 @@ export function moduleFromSmartImport(smartImportBase: AnySmartImport, arg: Asyn
   }
 
   if (isExtendedSmartImport(smartImportBase)) {
+    const { label, prefix } = smartImportBase
+
     if (isAsyncParams(arg)) {
-      return smartImportBase.smartImport({
-        imports: arg.imports,
-        inject: arg.inject,
-        async useFactory(...args: unknown[]) {
-          return pickLabeledAndPrefixed(await arg.useFactory(...args), smartImportBase.label, smartImportBase.prefix)
-        },
-      })
+      return smartImportBase.smartImport(
+        namespacedOnce(arg, label, prefix, () => ({
+          imports: arg.imports,
+          inject: arg.inject,
+          async useFactory(...args: unknown[]) {
+            return pickLabeledAndPrefixed(await arg.useFactory(...args), label, prefix)
+          },
+        })),
+      )
     } else {
-      return smartImportBase.smartImport(pickLabeledAndPrefixed(arg, smartImportBase.label, smartImportBase.prefix))
+      return smartImportBase.smartImport(
+        namespacedOnce(arg, label, prefix, () => pickLabeledAndPrefixed(arg, label, prefix)),
+      )
     }
   }
 

@@ -645,14 +645,37 @@ export class AppModule {}
 
 ### Instance Semantics
 
-Every call to a smart module factory creates its **own** `DynamicModule` — and therefore its own provider instances. In the composition example above, `BooksService` and `UsersService` each import `DatabaseService.smartModule`, so the application ends up with **two independent `DatabaseService` instances** receiving **the same merged configuration**. "Configured once" applies to configuration, not to instances.
+By default every call to a smart module factory creates its **own** `DynamicModule` — and therefore its own provider instances. In the composition example above, `BooksService` and `UsersService` each import `DatabaseService.smartModule`, so the application ends up with **two independent `DatabaseService` instances** receiving **the same merged configuration**. "Configured once" applies to configuration, not to instances.
 
 This holds on every supported NestJS major (verified on 10 and 11 under both module id algorithms — see `spec/module-identity.spec.ts`): the generated module classes are unique per call, so NestJS never deduplicates them.
 
 Practical consequences:
 
 - Stateless services are unaffected — extra instances are cheap.
-- Stateful services (connection pools, caches) are created once **per importing branch**. If a single shared instance matters, create the `DynamicModule` once and reuse the same object reference (NestJS deduplicates modules by reference), or provide the service through a `global: true` module — see the [Global Configuration recipe](#creating-a-global-configuration-module-the-forroot-pattern).
+- Stateful services (connection pools, caches) are created once **per importing branch** — unless the module declares itself shared.
+
+#### Shared Modules
+
+A module that must exist once declares `shared: true` in its own definition:
+
+```typescript
+@Injectable()
+export class DatabaseService {
+  static smartModule = smartModule({
+    shared: true,
+    smartConfigs: [DatabaseConfig],
+    providers: [DatabaseService],
+    exports: [DatabaseService],
+  })
+  constructor(private readonly config: DatabaseConfig) {}
+}
+```
+
+Its factory then builds the module **once per configuration object** and hands every later call the same `DynamicModule`, which NestJS registers once: in the composition example `BooksService` and `UsersService` receive **the same `DatabaseService` instance**, and every other module of the tree is unaffected (see `spec/shared-modules.spec.ts`).
+
+- **Shared means one per configuration, not one per application.** Two imports under different labels or prefixes read different configuration, so each gets a module of its own; two imports under the same label or prefix share one.
+- **The configuration object's identity is the key.** One root call — `AppModule.smartModule(config)`, or several factories handed the same `config` object — is one tree. Two calls with equal but separate objects are two trees and share nothing, so two applications built in one process never share a module.
+- **The setting is the module's own.** An importer cannot change it, and a module that does not declare it keeps the default.
 
 ## Advanced Usage
 
@@ -1329,6 +1352,7 @@ interface SmartModuleDefinition {
   providers?: any[]
   exports?: any[]
   global?: boolean
+  shared?: boolean // Build this module once per configuration object
 
   // Smart module specific properties
   smartConfigs?: SmartConfig[] // Configuration classes

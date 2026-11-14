@@ -4,7 +4,8 @@ import { smartModule } from '../src/smartModule'
 import { typeAssert, TypeTest, ExpectedFactoryType, matchExpectedModuleStructure } from './utils/spec-helpers'
 
 // Characterization of module identity semantics (README composition diamond):
-// every smartModule factory call produces its own DynamicModule, so each
+// every call of a factory that does not declare `shared` (spec/shared-modules.spec.ts)
+// produces its own DynamicModule, so each
 // importing branch gets its OWN service instance while the merged
 // configuration is delivered identically to all of them. This holds on
 // NestJS 10, 11 and 12 under both module id algorithms (deep-hash / reference) —

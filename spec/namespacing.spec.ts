@@ -94,6 +94,29 @@ describe('Configuration Namespacing', () => {
       static prefix = 'static_prefix_' as const
     }
 
+    it('should read the class prefix where an inline entry states none', () => {
+      const factory = smartModule({ smartConfigs: [{ smartConfig: ConfigPrefixed }] })
+
+      typeAssert<
+        TypeTest<
+          typeof factory,
+          ExpectedFactoryType<{
+            static_prefix_requiredProp: string
+            static_prefix_optionalProp?: string
+            static_prefix_defaultProp?: string
+          }>
+        >
+      >()
+
+      const module = factory({ static_prefix_requiredProp: 'inline-entry' })
+
+      matchExpectedModuleStructure(module, { imports: 1 })
+      matchExpectedConfigModule(module.imports![0], {
+        name: 'ConfigPrefixedSmartConfigModule',
+        value: { requiredProp: 'inline-entry', defaultProp: 'default' },
+      })
+    })
+
     it('should handle prefix functionality including static, inline, and overrides', async () => {
       // Test static prefix from config class
       const staticFactory = smartModule({ smartConfigs: [ConfigPrefixed] })
