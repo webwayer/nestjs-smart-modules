@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. Releases are managed by [release-please](https://github.com/googleapis/release-please); commits follow [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.4.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.3.0...v1.4.0) (2026-11-14)
+
+
+### Features
+
+* make a label optional when its configuration has no required field ([5373f43](https://github.com/webwayer/nestjs-smart-modules/commit/5373f43564fe5b57b2c79a744efcff98751fb4e0))
+* make a label optional when its configuration has no required field ([d23e13e](https://github.com/webwayer/nestjs-smart-modules/commit/d23e13e23ecfa5d05cbcbc95c5631a531a31f9f0)), closes [#39](https://github.com/webwayer/nestjs-smart-modules/issues/39)
+
+
+### Bug Fixes
+
+* **types:** keep a plain factory's label from turning optional ([78c7bde](https://github.com/webwayer/nestjs-smart-modules/commit/78c7bde3b7497d9ab155c175f5450f288134fc98))
+* **types:** let an extended import with no configuration contribute nothing ([a78da79](https://github.com/webwayer/nestjs-smart-modules/commit/a78da79fa26f34561beafcb016c73bd80cc67fbe))
+* **types:** let an extended import with no configuration contribute nothing ([b8ef2ac](https://github.com/webwayer/nestjs-smart-modules/commit/b8ef2acaa3130e55e6fc50a95f4379c186573670))
+
 ## [1.3.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.2.0...v1.3.0) (2026-11-05)
 
 
