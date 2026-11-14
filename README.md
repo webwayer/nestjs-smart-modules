@@ -310,6 +310,32 @@ export class AppModule {}
 
 > **Note:** A static `label` on a config class will be overridden if you provide a `label` property inline where the class is used.
 
+A label's key is required only when something under it is. If a class has no required field, its key is optional and a missing one reads as `{}`, so the class's defaults apply. The same goes for a labelled `smartImport` whose whole subtree is optional.
+
+**Example: Optional Labels**
+
+```typescript
+export class TuningConfig {
+  static label = 'tuning' as const
+  timeZone?: string = 'UTC'
+}
+export class DatabaseConfig {
+  static label = 'database' as const
+  url: string
+}
+
+export class AppService {
+  static smartModule = smartModule({
+    smartConfigs: [TuningConfig, DatabaseConfig],
+  })
+}
+
+AppService.smartModule({ database: { url: 'postgres://localhost:5432' } }) // `tuning` falls back to its defaults
+AppService.smartModule({}) // compile error: `database` is missing
+```
+
+> **Note:** Only the compiler can enforce a required label, because a field with no initializer leaves nothing in the class at run time. An untyped caller that leaves out `database` gets an instance with no `url` rather than an error, just as with an unlabelled class. The same goes for a configuration typed `any`, such as the result of `ConfigService.get()` in a `useFactory`, so validate those yourself. A misspelt optional label is caught in an object literal, but not in a variable or a `useFactory` result that also has another valid key.
+
 ### Prefixes: Flattened Property Naming
 
 Prefixes add a prefix to each property name, creating a flat configuration structure. This is useful for avoiding property name conflicts while keeping all settings at the same level.

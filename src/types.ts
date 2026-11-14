@@ -33,7 +33,10 @@ export function isAsyncParams<T>(o: T | AsyncParams<T>): o is AsyncParams<T> {
 export interface SmartConfig<T = any> extends Type<T> {
   /** Prefixes every property name in the merged configuration (`db_port`). */
   prefix?: string
-  /** Nests the configuration under this key in the merged object. */
+  /**
+   * Nests the configuration under this key in the merged object. The key is
+   * optional when the class has no required field: a missing one reads as `{}`.
+   */
   label?: string
   /** Overrides the injection token (defaults to the class itself). */
   token?: string | symbol

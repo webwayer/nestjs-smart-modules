@@ -19,7 +19,7 @@ function filterByPrefix(obj: PlainObject, prefix?: string): PlainObject {
 }
 
 function pickLabel(obj: PlainObject, label?: string): PlainObject {
-  return label ? (obj[label] as PlainObject) : obj
+  return label ? ((obj[label] ?? {}) as PlainObject) : obj
 }
 
 export function pickLabeledAndPrefixed(obj: object | undefined, label?: string, prefix?: string) {
