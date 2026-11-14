@@ -129,6 +129,14 @@ export type SmartModule<TC extends AnySmartConfig[], TI extends AnySmartImport[]
   imports?: ImportsOptions
   controllers?: ControllersOptions
   global?: DynamicModule['global']
+  /**
+   * `true` builds this module once per configuration object: every branch of
+   * a tree that imports it under the same configuration receives the same
+   * `DynamicModule`, so NestJS creates its providers once. Left out or
+   * `false`, each import builds a module — and provider instances — of its
+   * own.
+   */
+  shared?: boolean
   smartConfigs?: [...TC]
   smartImports?: [...TI]
 }

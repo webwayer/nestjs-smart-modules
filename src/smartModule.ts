@@ -34,8 +34,9 @@ import type { InferSmartSchema, WithSmartSchema } from './schema.js'
  * module definition can depend on resolved configuration.
  *
  * Each factory call creates its own `DynamicModule` (and therefore its own
- * provider instances); the merged configuration is delivered identically to
- * every branch of the tree.
+ * provider instances) unless the definition declares `shared: true`, which
+ * builds the module once per configuration object; the merged configuration
+ * is delivered identically to every branch of the tree.
  *
  * @example
  * ```ts
@@ -96,56 +97,50 @@ export function smartModule(...args: unknown[]) {
     AnySmartImport[]
   >
 
-  const factory = function (this: { name?: string } | undefined, arg: object | AsyncParams<object>) {
-    const module = createNamedClass((this?.name || '') + 'SmartModule')
-    const inlineSmartConfigModules = inlineSmartConfigs.map(c => moduleFromSmartConfig(c, arg))
+  // The module each configuration object was given, for a definition that
+  // declares `shared`: NestJS registers one DynamicModule object once, however
+  // many branches import it.
+  const sharedModules = new WeakMap<object, DynamicModule>()
 
-    if (isSmartModule(smartModuleOrFactory)) {
-      const moduleDefinition = smartModuleOrFactory
+  const factory = function (this: { name?: string } | undefined, arg?: object | AsyncParams<object>) {
+    // A tree that takes no configuration is still one tree: the object made
+    // here is what every import beneath this call is handed and keyed by.
+    const config = arg ?? {}
+    const inlineSmartConfigModules = inlineSmartConfigs.map(c => moduleFromSmartConfig(c, config))
 
-      const smartConfigModules = (moduleDefinition.smartConfigs || []).map(c => moduleFromSmartConfig(c, arg))
-      const smartImportModules = (moduleDefinition.smartImports || []).map(c => moduleFromSmartImport(c, arg))
+    const { shared, smartConfigs, smartImports, ...nestModule } = isSmartModule(smartModuleOrFactory)
+      ? smartModuleOrFactory
+      : isAsyncParams(config)
+        ? smartModuleOrFactory(inlineSmartConfigModules)
+        : smartModuleOrFactory(
+            inlineSmartConfigModules,
+            // Instantiated config objects; the factory's variadic parameter is
+            // typed through UnboxSmartConfigs on the overload side, so the
+            // untyped implementation casts here.
+            ...(inlineSmartConfigs.map(c =>
+              isSmartConfig(c) ? instantiateSmartConfig(c, config) : instantiateExtendedSmartConfig(c, config),
+            ) as AnySmartConfig[]),
+          )
 
-      return appendImports({ module, ...moduleDefinition }, [
-        ...inlineSmartConfigModules,
-        ...smartConfigModules,
-        ...smartImportModules,
-      ])
+    const built = shared ? sharedModules.get(config) : undefined
+
+    if (built) {
+      return built
     }
 
-    if (isAsyncParams(arg)) {
-      const moduleDefinition = smartModuleOrFactory(inlineSmartConfigModules)
-
-      const smartConfigModules = (moduleDefinition.smartConfigs || []).map(c => moduleFromSmartConfig(c, arg))
-      const smartImportModules = (moduleDefinition.smartImports || []).map(c => moduleFromSmartImport(c, arg))
-
-      return appendImports({ module, ...moduleDefinition }, [
-        ...inlineSmartConfigModules,
-        ...smartConfigModules,
-        ...smartImportModules,
-      ])
-    }
-
-    // Instantiated config objects; the factory's variadic parameter is typed
-    // through UnboxSmartConfigs on the overload side, so the untyped
-    // implementation casts here.
-    const inlineSmartConfigInstances = inlineSmartConfigs.map(c => {
-      if (isSmartConfig(c)) {
-        return instantiateSmartConfig(c, arg)
-      }
-      return instantiateExtendedSmartConfig(c, arg)
-    }) as AnySmartConfig[]
-
-    const moduleDefinition = smartModuleOrFactory(inlineSmartConfigModules, ...inlineSmartConfigInstances)
-
-    const smartConfigModules = (moduleDefinition.smartConfigs || []).map(c => moduleFromSmartConfig(c, arg))
-    const smartImportModules = (moduleDefinition.smartImports || []).map(c => moduleFromSmartImport(c, arg))
-
-    return appendImports({ module, ...moduleDefinition }, [
+    // `shared`, `smartConfigs` and `smartImports` are read here and stay here:
+    // NestJS is handed the keys of a DynamicModule and nothing else.
+    const module = appendImports({ module: createNamedClass((this?.name || '') + 'SmartModule'), ...nestModule }, [
       ...inlineSmartConfigModules,
-      ...smartConfigModules,
-      ...smartImportModules,
+      ...(smartConfigs ?? []).map(c => moduleFromSmartConfig(c, config)),
+      ...(smartImports ?? []).map(c => moduleFromSmartImport(c, config)),
     ])
+
+    if (shared) {
+      sharedModules.set(config, module)
+    }
+
+    return module
   }
 
   const definition = isSmartModule(smartModuleOrFactory) ? smartModuleOrFactory : {}
