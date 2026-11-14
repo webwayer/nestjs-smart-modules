@@ -119,8 +119,9 @@ describe('Shared Modules', () => {
 
       const [usersModule, booksModule] = importsOf(factory({ url: 'postgres://shared' }))
 
-      matchExpectedModuleStructure(usersModule, { imports: 1 })
-      matchExpectedModuleStructure(booksModule, { imports: 1 })
+      // a factory called as an import has no class to take a name from
+      matchExpectedModuleStructure(usersModule, { moduleName: 'SmartModule', imports: 1 })
+      matchExpectedModuleStructure(booksModule, { moduleName: 'SmartModule', imports: 1 })
 
       expect(importsOf(usersModule)[0]).toBe(importsOf(booksModule)[0])
     })

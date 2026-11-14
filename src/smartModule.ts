@@ -122,23 +122,22 @@ export function smartModule(...args: unknown[]) {
             ) as AnySmartConfig[]),
           )
 
-    const built = shared ? sharedModules.get(config) : undefined
-
-    if (built) {
-      return built
-    }
-
     // `shared`, `smartConfigs` and `smartImports` are read here and stay here:
     // NestJS is handed the keys of a DynamicModule and nothing else.
-    const module = appendImports({ module: createNamedClass((this?.name || '') + 'SmartModule'), ...nestModule }, [
-      ...inlineSmartConfigModules,
-      ...(smartConfigs ?? []).map(c => moduleFromSmartConfig(c, config)),
-      ...(smartImports ?? []).map(c => moduleFromSmartImport(c, config)),
-    ])
+    const build = () =>
+      appendImports({ module: createNamedClass((this?.name || '') + 'SmartModule'), ...nestModule }, [
+        ...inlineSmartConfigModules,
+        ...(smartConfigs ?? []).map(c => moduleFromSmartConfig(c, config)),
+        ...(smartImports ?? []).map(c => moduleFromSmartImport(c, config)),
+      ])
 
-    if (shared) {
-      sharedModules.set(config, module)
+    if (!shared) {
+      return build()
     }
+
+    const module = sharedModules.get(config) ?? build()
+
+    sharedModules.set(config, module)
 
     return module
   }
