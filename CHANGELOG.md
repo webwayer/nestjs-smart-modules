@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Releases are managed by [release-please](https://github.com/googleapis/release-please); commits follow [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.4.0...v1.5.0) (2026-11-14)
+
+
+### Features
+
+* let a module declare itself shared and be built once per configuration ([982a61f](https://github.com/webwayer/nestjs-smart-modules/commit/982a61fd15fd41bb0c719a864569d52153e878b8))
+
 ## [1.4.0](https://github.com/webwayer/nestjs-smart-modules/compare/v1.3.0...v1.4.0) (2026-11-14)
 
 
